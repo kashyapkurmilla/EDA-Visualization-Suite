@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dataviz.css') }}">
+</head>
+<body>
+    <div class="header">
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
+    </div>
+    <div class="data-preview">
+        <div class="data-preview-container">
+            {% if tables %}
+                <h2>Data Visualization</h2>
+                {{ tables[0]|safe }}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
