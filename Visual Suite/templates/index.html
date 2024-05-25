@@ -3,33 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EY Visual Suite</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <title>Login Page</title>
     <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
 </head>
 <body>
     <div class="header">
         <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
     </div>
-
-    <div class="upload-container">
-        <h2>Upload a File</h2>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" id="file" required>
-            <br>
-            <input type="submit" value="Upload">
-        </form>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form action="{{ url_for('login') }}" method="post">
+            <div class="msg">{{ msg }}</div>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>        
+        <a href="{{url_for('register')}}">Not a user? Register</a>
     </div>
-
-    <div class="data-preview">
-        <div class="data-preview-container">
-            {% if tables %}
-                <h2>Data Preview</h2>
-                {{ tables[0]|safe }}
-            {% endif %}
-        </div>
-    </div>
-
-    <button class="data-viz-button" onclick="DataViz()">Data Viz</button>
 </body>
 </html>
+

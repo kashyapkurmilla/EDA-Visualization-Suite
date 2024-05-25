@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EY Visual Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="dropdown">
+            <button class="dropbtn">Dropdown</button>
+            <div class="dropdown-content">
+                <a href="#">A</a>
+                <a href="#">B</a>
+                <a href="#">C</a>
+                <a href="#">D</a>
+                <a href="#">E</a>
+            </div>
+        </div>
+
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
+    </div>
+
+    <div class="container">
+        <div class="left-section">
+            <div class="upload-container">
+                <h2>Upload a File</h2>
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_data') }}">
+                    <input type="file" name="file" id="file" required>
+                    <br>
+                    <input type="submit" value="Upload">
+                </form>
+            </div>
+
+            <div class="data-preview">
+                <div class="data-preview-container">
+                    {% if preview_table %}
+                        <h2>Data Preview</h2>
+                        {{ preview_table|safe }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="data-visualization">
+                <div class="data-visualization-container">
+                    {% if full_table %}
+                        <h2>Data Visualization</h2>
+                        {{ full_table|safe }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
