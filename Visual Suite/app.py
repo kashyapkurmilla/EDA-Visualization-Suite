@@ -57,7 +57,29 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    msg = ''
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        re_password = request.form['re_password']
+        email = request.form['email']
+
+        if password != re_password:
+            msg = 'Passwords do not match!'
+        else:
+            connection = get_db_connection()
+            if connection:
+                cursor = connection.cursor(dictionary=True)
+                cursor.execute('INSERT INTO login (username, passwrd, email) VALUES (%s, %s, %s)', (username, password, email))
+                connection.commit()
+                cursor.close()
+                connection.close()
+                msg = 'You have successfully registered!'
+                return render_template('index.html', msg=msg)
+            else:
+                msg = 'Could not connect to the database.'
+
+    return render_template('register.html', msg=msg)
 
 @app.route('/upload_data', methods=['GET', 'POST'])
 def upload_data():
