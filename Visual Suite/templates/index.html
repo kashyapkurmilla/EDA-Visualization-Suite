@@ -3,74 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload Page</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #333333; /* Dark grey background */
-        }
-        .header {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        .header img {
-            max-width: 150px; /* Adjust the size of the image */
-            height: auto;
-        }
-        .upload-container {
-            background-color: rgba(255, 230, 0, 0.9); /* Yellow background with some transparency */
-            padding: 20px;
-            border-radius: 10px;
-            color: #333333; /* Dark grey text color */
-            text-align: center;
-            position: absolute;
-            top: 20px;
-            left: 20px; /* Position the upload container to the top left */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for style */
-            border: 1px solid #333333; /* Add a dark border for contrast */
-        }
-        .upload-container h2 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
-        }
-        input[type="file"] {
-            margin-top: 10px;
-            padding: 5px;
-            border: 1px solid #333333;
-            border-radius: 5px;
-        }
-        input[type="submit"] {
-            margin-top: 10px;
-            background-color: #333333; /* Dark grey background */
-            color: rgb(255, 230, 0); /* Yellow text */
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        input[type="submit"]:hover {
-            background-color: #1e1e1e;
-        }
-    </style>
+    <title>Login Page</title>
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
 </head>
 <body>
     <div class="header">
-        <img src="{{url_for('static', filename='/images/heading.png')}}" alt="Header Image" id="header-image">
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
     </div>
-    <div class="upload-container">
-        <h2>Upload a File</h2>
-        <form action="#" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" id="file">
-            <br>
-            <input type="submit" value="Upload">
-        </form>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form action="{{ url_for('login') }}" method="post">
+            <div class="msg">{{ msg }}</div>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>        
+        <a href="{{url_for('register')}}">Not a user? Register</a>
     </div>
 </body>
 </html>
+
