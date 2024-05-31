@@ -83,19 +83,33 @@ def register():
 
 @app.route('/upload_data', methods=['GET', 'POST'])
 def upload_data():
+    """Handles file upload and data display."""
+
     if request.method == 'POST':
         if 'file' not in request.files:
             return redirect(request.url)
-        
+
         file = request.files['file']
         if file.filename == '':
             return redirect(request.url)
 
         if file:
-            df = pd.read_csv(file)
-            session['preview_df'] = df.head(5).to_html(index=False)
-            session['full_df'] = df.to_html(index=False)
-            return render_template('landingpage.html', preview_table=session['preview_df'], full_table=session['full_df'])
+            try:
+                df = pd.read_csv(file)
+            except Exception as e:
+                return f"Error reading CSV file: {e}"
+
+            # Get column names and data types
+            column_info = {col: str(df[col].dtype) for col in df.columns}
+
+            # Store data in session for later use (if needed)
+            session['full_df'] = df.head(15).to_html(index=False)
+            session['uploaded_filename'] = file.filename  # Store filename in session
+
+            return render_template('landingpage.html', 
+                                   column_info=column_info, 
+                                   full_table=session.get('full_df'),
+                                   uploaded_filename=session.get('uploaded_filename'))
 
     return render_template('landingpage.html')
 

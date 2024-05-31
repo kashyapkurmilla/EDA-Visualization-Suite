@@ -1,8 +1,8 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #333333;
-    color: #333333;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dark background - EY color */
+    color: #ffffff; /* Light text */
 }
 
 .navbar {
@@ -11,168 +11,204 @@ body {
     left: 0;
     width: 100%;
     background-color: #333333;
-    padding: 5px 20px; /* Adjusted padding */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px 15px; /* Reduced padding */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Softer shadow */
     z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+.nav {
+    display: flex;
+    align-items: center;
+    margin-left: 1050px;
+    gap: 2rem; /* Adjusted gap */
+    flex-grow: 1;
+}
+
 .navbar img {
-    max-width: 100px; /* Adjusted max-width */
+    max-width: 70px; /* Reduced size */
     height: auto;
-    margin-left: auto;
 }
 
-
-.container {
-    display: flex;
+.navbar .dropdown {
+    position: relative;
+    display: inline-block;
 }
 
-.left-section {
-    width: 50%;
-    padding: 20px;
-    overflow-y: auto;
-    height: calc(100vh - 60px);
-}
-
-.right-section {
-    width: 50%;
-    padding: 20px;
-    overflow-y: auto;
-    height: calc(100vh - 60px);
-}
-
-.upload-container {
-    background-color: rgba(255, 230, 0, 0.9);
-    padding: 35px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border: 1px solid #333333;
-    width: 300px;
-    margin-bottom: 20px;
-}
-
-.upload-container h2 {
-    margin: 0 0 10px 0;
-    font-size: 20px;
-    text-align: center;
-}
-
-.upload-container input[type="file"],
-.upload-container input[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #333333;
-    border-radius: 5px;
-}
-
-.upload-container input[type="submit"] {
-    background-color: #333333;
-    color: rgb(255, 230, 0);
+.navbar .dropbtn-text {
+    margin-right: 10px; /* Reduced margin */
+    margin-left: 10px; /* Reduced margin */
+    font-size: 16px; /* Reduced font size */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    color: #ffffff; /* White color for text */
+    text-decoration: none;
+    font-weight: 500; /* Slightly bolder */
+    position: relative;
+    padding-bottom: 8px; /* Reduced padding */
 }
 
-.upload-container input[type="submit"]:hover {
-    background-color: #1e1e1e;
-}
-
-.data-preview {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.data-preview-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
-}
-
-.data-preview h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.data-visualization {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.data-visualization-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.data-visualization h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.upload-container,
-.data-preview,
-.data-visualization {
-    margin-top: 100px;
-}
-
-.dropdown {
+.navbar .dropbtn-text::after {
+    content: '';
     position: absolute;
-    top: 10px;
-    left: 10px;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #FFB400;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+    z-index: 1; /* Ensure it is above the dropdown content */
 }
 
-.dropdown button {
-    background-color: #333333;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
+.navbar .dropbtn-text:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
 }
-
-.dropdown button:hover {
-    background-color: yellow;
-}
-
 
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    z-index: 1;
+    background-color: #262626; /* Darker grey */
+    min-width: 160px; /* Reduced width */
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 2; /* Ensure it is above other content but below the underline */
+    border-radius: 8px; /* More rounded corners */
+    top: 100%; /* Position it below the dropdown text */
+    margin-top: 10px; /* Reduced margin */
 }
 
 .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
+    color: #ffffff;
+    padding: 10px 12px; /* Reduced padding */
     text-decoration: none;
     display: block;
+    transition: background-color 0.2s ease; /* Smooth transition */
 }
 
 .dropdown-content a:hover {
-    background-color: #f1f1f1;
+    background-color: #3d3d3d; /* Darker grey on hover */
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
 }
 
-.dropdown:hover .dropbtn {
-    background-color: #555;
+.container {
+    display: flex;
+    padding-top: 80px; /* Adjusted for fixed navbar */
 }
 
-.data-preview-container,
+.left-section, .right-section {
+    width: 50%;
+    padding: 15px; /* Reduced padding */
+    overflow-y: auto;
+    height: calc(100vh - 80px); 
+}
+
+.upload-container {
+    background-color: #FFB400;
+    padding: 30px; /* Reduced padding */
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* Bolder shadow */
+    width: 300px; /* Reduced width */
+    margin-bottom: 15px; /* Reduced margin */
+    text-align: center; /* Center content */
+}
+
+.upload-container h2 {
+    color: #121212; 
+    font-size: 20px; /* Reduced font size */
+    margin-bottom: 15px; /* Reduced margin */
+}
+
+.upload-container input[type="file"],
+.upload-container input[type="submit"] {
+    width: calc(100% - 20px); 
+    padding: 10px; /* Reduced padding */
+    margin: 10px 0; /* Reduced margin */
+    border: 1px solid #121212;
+    border-radius: 6px; 
+    background-color: #ffe699; /* Lighter yellow for input */
+    color: #121212; 
+}
+
+.upload-container input[type="submit"] {
+    background-color: #121212; 
+    color: #FFB400; 
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.upload-container input[type="submit"]:hover {
+    background-color: #333333; /* Darker grey on hover */
+}
+
+.data-preview, .data-visualization {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.data-preview-container, 
 .data-visualization-container {
+    background-color: #262626; /* Darker grey for content */
+    padding: 20px; /* Reduced padding */
+    border-radius: 12px; 
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    width: 100%;
     overflow-x: auto;
+}
+
+.data-preview h2, 
+.data-visualization h2 {
+    font-size: 20px; /* Reduced font size */
+    margin-bottom: 15px; /* Reduced margin */
+    color: #ffffff;
+    text-align: left; /* Align heading to the left */
+}
+
+.upload-container,
+.data-preview,
+.data-visualization {
+    margin-top: 15px; /* Reduced margin */
+}
+
+/* Compact Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px; /* Reduced margin */
+    font-size: 14px; /* Smaller font size for compactness */
+}
+
+th, td {
+    border: 1px solid #3d3d3d; /* Darker border */
+    padding: 5px 7px; /* Reduced padding */
+    text-align: left;
+}
+
+th {
+    background-color: #333333; /* Darker grey for table header */
+    color: #ffffff;
+    font-weight: 600; /* Bolder header text */
+}
+
+::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #262626; /* Darker grey background for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #505050; /* Even darker grey for the thumb */
+    border-radius: 4px; /* Slightly rounded corners for the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #3d3d3d; /* Slightly lighter on hover */
 }

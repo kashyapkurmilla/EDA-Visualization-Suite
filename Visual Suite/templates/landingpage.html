@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,38 +10,95 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
+
 <body>
     <div class="navbar">
-        <div class="dropdown">
-            <button class="dropbtn">Dropdown</button>
-            <div class="dropdown-content">
-                <a href="#">A</a>
-                <a href="#">B</a>
-                <a href="#">C</a>
-                <a href="#">D</a>
-                <a href="#">E</a>
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
+        <div class="nav">
+            <div class="dropdown">
+                <span class="dropbtn-text">Describe</span>
+                <div class="dropdown-content">
+                    <a href="#">Columns Summary</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Describe</span>
+                <div class="dropdown-content">
+                    <a href="#">Columns Summary</a>
+                    <a href="#">Row Details</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Visualize</span>
+                <div class="dropdown-content">
+                    <a href="#">Charts</a>
+                    <a href="#">Graphs</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Analyze</span>
+                <div class="dropdown-content">
+                    <a href="#">Data Analysis</a>
+                    <a href="#">Statistical Models</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Report</span>
+                <div class="dropdown-content">
+                    <a href="#">Generate Report</a>
+                    <a href="#">Export Data</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Settings</span>
+                <div class="dropdown-content">
+                    <a href="#">Preferences</a>
+                    <a href="#">User Settings</a>
+                </div>
             </div>
         </div>
-
-        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
     </div>
 
     <div class="container">
         <div class="left-section">
-            <div class="upload-container">
+            <div class="upload-container" id="upload-container">
                 <h2>Upload a File</h2>
-                <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_data') }}">
-                    <input type="file" name="file" id="file" required>
+                <form id="upload-form" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="file" id="file" accept=".csv" required>
                     <br>
                     <input type="submit" value="Upload">
                 </form>
             </div>
 
+            <div id="upload-controls">
+                <button id="toggle-upload" style="display: none;">Toggle Upload</button>
+                <span id="file-name"></span>
+            </div>
+
             <div class="data-preview">
                 <div class="data-preview-container">
-                    {% if preview_table %}
-                        <h2>Data Preview</h2>
-                        {{ preview_table|safe }}
+                    {% if column_info %}
+                    <h2>Data Summary - {{ uploaded_filename }}</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for column, dtype in column_info.items() %}
+                            <tr>
+                                <td>{{ column }}</td>
+                                <td>{{ dtype }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                     {% endif %}
                 </div>
             </div>
@@ -50,12 +108,13 @@
             <div class="data-visualization">
                 <div class="data-visualization-container">
                     {% if full_table %}
-                        <h2>Data Visualization</h2>
-                        {{ full_table|safe }}
+                    <h2>Data Visualization - {{ uploaded_filename }}</h2>
+                    {{ full_table|safe }}
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
