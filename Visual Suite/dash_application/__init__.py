@@ -1,15 +1,10 @@
 import dash
 from dash import dcc, html
-import plotly.express as px
-import pandas as pd
-import dash
-from dash import dcc, html
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
 import plotly.figure_factory as ff
-
 
 def create_missing_dash_application(flask_app):
     dash_app = dash.Dash(
@@ -19,31 +14,19 @@ def create_missing_dash_application(flask_app):
         external_stylesheets=[dbc.themes.DARKLY]
     )
 
-    dropdown = dbc.DropdownMenu(
-        [
-            dbc.DropdownMenuItem(dcc.Link("Missing Analysis", href="/dash/", style={'color': 'white', 'textDecoration': 'none'})),
-            dbc.DropdownMenuItem(dcc.Link("Correlation Matrix", href="/dash1/", style={'color': 'white', 'textDecoration': 'none'})),
-        ],
-        label="Dropdown",
-        color="dark",
-    )
-
     navbar = dbc.Navbar(
         [
-            dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-            dbc.Collapse(
-                dbc.Nav(
-                    [
-                        dropdown
-                    ],
-                    className="ml-auto",
-                ),
-                id="navbar-collapse",
-                navbar=True,
-            ),
             dbc.NavbarBrand(
                 html.Img(src="/static/images/heading.png", height="70px"),
-                className="ms-auto",  # Align to the right
+                className="me-auto",
+                style={'margin-right': '20px'}  # Add margin-right here
+            ),
+            dbc.Nav(
+                [
+                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
+                ],
+                className="ml-auto",
             ),
         ],
         color="dark",  # Use the 'dark' color theme
@@ -75,10 +58,10 @@ def create_missing_dash_application(flask_app):
 
     dash_app.layout = layout
     return dash_app
+
 def update_dash_app(dash_app, df):  
     if df is not None and not df.empty:
         non_missing_values = df.notnull().sum()
-        
         non_missing_df = pd.DataFrame({'Column': non_missing_values.index, 'Non-Missing Values': non_missing_values.values})
 
         fig = px.bar(non_missing_df, x='Column', y='Non-Missing Values',
@@ -89,31 +72,20 @@ def update_dash_app(dash_app, df):
             paper_bgcolor='#333333',
             font=dict(color='white')
         )
-        dropdown = dbc.DropdownMenu(
-            [
-                dbc.DropdownMenuItem(dcc.Link("Missing Analysis", href="/dash/", style={'color': 'white', 'textDecoration': 'none'})),
-            dbc.DropdownMenuItem(dcc.Link("Correlation Matrix", href="/dash1/", style={'color': 'white', 'textDecoration': 'none'})),
-            ],
-            label="Dropdown",
-            color="dark",
-        )
 
         navbar = dbc.Navbar(
             [
-                dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-                dbc.Collapse(
-                    dbc.Nav(
-                        [
-                            dropdown
-                        ],
-                        className="ml-auto",
-                    ),
-                    id="navbar-collapse",
-                    navbar=True,
-                ),
                 dbc.NavbarBrand(
                     html.Img(src="/static/images/heading.png", height="70px"),
-                    className="ms-auto",  # Align to the right
+                    className="me-auto",
+                    style={'margin-right': '20px'}  # Add margin-right here
+                ),
+                dbc.Nav(
+                    [
+                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
+                        dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
+                    ],
+                    className="ml-auto",
                 ),
             ],
             color="dark",  # Use the 'dark' color theme
@@ -137,7 +109,6 @@ def update_dash_app(dash_app, df):
 
         dash_app.layout = layout
 
-        
 def create_cm_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app, 
@@ -146,38 +117,25 @@ def create_cm_dash(flask_app):
         external_stylesheets=[dbc.themes.DARKLY]
     )
 
-    dropdown = dbc.DropdownMenu(
-        [
-            dbc.DropdownMenuItem(dcc.Link("Missing Analysis", href="/dash/", style={'color': 'white', 'textDecoration': 'none'})),
-            dbc.DropdownMenuItem(dcc.Link("Correlation Matrix", href="/dash1/", style={'color': 'white', 'textDecoration': 'none'})),
-        ],
-        label="More",
-        color="dark",
-    )
-
     navbar = dbc.Navbar(
-    [
-        dbc.NavbarBrand(
-            html.Img(src="/static/images/heading.png", height="70px"),
-            className="ml-auto",  # Align to the left
-        ),
-        dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-        dbc.Collapse(
+        [
+            dbc.NavbarBrand(
+                html.Img(src="/static/images/heading.png", height="70px"),
+                className="me-auto",
+                style={'margin-right': '20px'}  # Add margin-right here
+            ),
             dbc.Nav(
                 [
-                    dropdown
+                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
                 ],
                 className="ml-auto",
             ),
-            id="navbar-collapse",
-            navbar=True,
-        ),
-    ],
-    color="dark",  # Use the 'dark' color theme
-    dark=True,
-    className='bg-dark'
-)
-
+        ],
+        color="dark",  # Use the 'dark' color theme
+        dark=True,
+        className='bg-dark'
+    )
 
     colors = {
         'background': '#333333',
@@ -219,7 +177,6 @@ def update_cm_dash(dash_app, df):
             options=[{'label': col, 'value': col} for col in column_names],
             placeholder="Select column",
             style={'color': 'black'}
-            
         )
 
         dropdown2 = dcc.Dropdown(
@@ -266,7 +223,7 @@ def update_cm_dash(dash_app, df):
                 annotation_text=selected_correlation_matrix.values.round(2),
                 hoverinfo='z',
                 xgap=1, ygap=1,
-                font_colors=['white','black']  # Set text color to white
+                font_colors=['white', 'black']  # Set text color to white
             )
             fig.update_layout(
                 plot_bgcolor='#333333',
@@ -275,36 +232,26 @@ def update_cm_dash(dash_app, df):
                 yaxis=dict(tickfont=dict(color='white'))   # Set y-axis text color to white
             )
             return fig
-        dropdown = dbc.DropdownMenu(
-        [
-            dbc.DropdownMenuItem(dcc.Link("Missing Analysis", href="/dash/", style={'color': 'white', 'textDecoration': 'none'})),
-            dbc.DropdownMenuItem(dcc.Link("Correlation Matrix", href="/dash1/", style={'color': 'white', 'textDecoration': 'none'})),
-        ],
-        label="Dropdown",
-        color="dark",
-    )
+
         navbar = dbc.Navbar(
-        [
-            dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-            dbc.Collapse(
+            [
+                dbc.NavbarBrand(
+                    html.Img(src="/static/images/heading.png", height="70px"),
+                    className="me-auto",
+                    style={'margin-right': '20px'}  # Add margin-right here
+                ),
                 dbc.Nav(
                     [
-                        dropdown
+                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
+                        dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
                     ],
                     className="ml-auto",
                 ),
-                id="navbar-collapse",
-                navbar=True,
-            ),
-            dbc.NavbarBrand(
-                html.Img(src="/static/images/heading.png", height="70px"),
-                className="ms-auto",  # Align to the right
-            ),
-        ],
-        color="dark",  # Use the 'dark' color theme
-        dark=True,
-        className='bg-dark'
-    )
+            ],
+            color="dark",  # Use the 'dark' color theme
+            dark=True,
+            className='bg-dark'
+        )
 
         # Update the layout with the new structure
         dash_app.layout = html.Div([
@@ -313,8 +260,3 @@ def update_cm_dash(dash_app, df):
             html.Div([dropdown1, dropdown2], style={'width': '50%', 'display': 'inline-block'}),
             heatmap
         ], style={'backgroundColor': '#333333'})
-
-
-
-
-
