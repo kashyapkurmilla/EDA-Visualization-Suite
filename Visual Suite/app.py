@@ -4,12 +4,17 @@ import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
 import os
-
+from dash_application import create_cm_dash,create_missing_dash_application,update_cm_dash,update_dash_app
+from dash_application.statistics import create_stats_dash,update_stats_dash
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "sessionkey1"
 
+#
+dash_app1 = create_missing_dash_application(app)
+dash_app2 = create_cm_dash(app)
+dash_app3 = create_stats_dash(app)
 db_config = {
     'host': os.getenv('MYSQL_HOST'),
     'user': os.getenv('MYSQL_USER'),
@@ -83,12 +88,10 @@ def register():
 
 @app.route('/upload_data', methods=['GET', 'POST'])
 def upload_data():
-    """Handles file upload and data display."""
-
     if request.method == 'POST':
         if 'file' not in request.files:
             return redirect(request.url)
-
+        
         file = request.files['file']
         if file.filename == '':
             return redirect(request.url)
@@ -99,12 +102,13 @@ def upload_data():
             except Exception as e:
                 return f"Error reading CSV file: {e}"
 
-            # Get column names and data types
             column_info = {col: str(df[col].dtype) for col in df.columns}
-
-            # Store data in session for later use (if needed)
             session['full_df'] = df.head(15).to_html(index=False)
-            session['uploaded_filename'] = file.filename  # Store filename in session
+            session['uploaded_filename'] = file.filename 
+            
+            update_dash_app(dash_app1,df)
+            update_cm_dash(dash_app2,df)
+            update_stats_dash(dash_app3,df)
 
             return render_template('landingpage.html', 
                                    column_info=column_info, 
@@ -113,18 +117,13 @@ def upload_data():
 
     return render_template('landingpage.html')
 
-# @app.route('/test_db')
-# def test_db():
-#     connection = get_db_connection()
-#     if connection:
-#         cursor = connection.cursor()
-#         cursor.execute('SELECT 1')
-#         result = cursor.fetchone()
-#         cursor.close()
-#         connection.close()
-#         return f"Database connection is working: {result}"
-#     else:
-#         return "Error: Could not connect to the database."
+@app.route('/correlation', methods=['GET', 'POST'])
+def correlation():
+    return redirect ('/dash1/')
+
+@app.route('/missingvalues', methods=['GET', 'POST'])
+def missingvalues():
+    return redirect ('/dash/')
 
 if __name__ == "__main__":
     app.run(debug=True)
