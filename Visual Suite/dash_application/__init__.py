@@ -218,12 +218,12 @@ def update_cm_dash(dash_app, df):
                 z=selected_correlation_matrix.values,
                 x=x,
                 y=y,
-                colorscale='Plasma',  # Yellow-Orange-Red palette
+                colorscale=[[0, 'grey'], [0.5, '#FFE600'], [1, 'grey']],  # Yellow-Orange-Red palette
                 showscale=True,
                 annotation_text=selected_correlation_matrix.values.round(2),
                 hoverinfo='z',
                 xgap=1, ygap=1,
-                font_colors=['white', 'black']  # Set text color to white
+                font_colors=['white']  # Set text color to white
             )
             fig.update_layout(
                 plot_bgcolor='#333333',
