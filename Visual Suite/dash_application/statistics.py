@@ -9,60 +9,81 @@ def create_stats_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app,
         name="Dashboard",
-        url_base_pathname="/stats/",
+        url_base_pathname="/statistics/",
         external_stylesheets=[dbc.themes.DARKLY]
     )
+
+    navbar = dbc.Navbar(
+        [
+            dbc.NavbarBrand(
+                html.Img(src="/static/images/heading.png", height="70px"),
+                className="me-auto",
+                style={'margin-right': '20px'}  # Add margin-right here
+            )
+        ],
+        color="dark",  # Use the 'dark' color theme
+        dark=True,
+        className='bg-dark'
+    )
+
+    # Define left and right sections
+    left_section = html.Div(
+        className="left-section",
+        children=[
+            html.Div(
+                className="data-preview",
+                children=[
+                    html.Div(
+                        className="data-preview-container",
+                        children=[
+                            html.H3("Column Statistics"),
+                            dcc.Dropdown(
+                                id='column-dropdown',
+                                options=[],
+                                value=None,
+                                placeholder="Select a column",
+                                style={'backgroundColor': '#888888', 'color': '#000000'}
+                            ),
+                            html.Div(id="column-stats")  # Placeholder for stats
+                        ]
+                    )
+                ]
+            )
+        ],
+        style={'width': '30%'}  # Reduced width to 30%
+    )
+
+    right_section = html.Div(
+        className="right-section",
+        children=[
+            html.Div(
+                className="data-visualization",
+                children=[
+                    html.Div(
+                        className="data-visualization-container",
+                        children=[
+                            html.Div(id="column-plot")  # Placeholder for plot
+                        ]
+                    )
+                ]
+            )
+        ],
+        style={'width': '70%'}  # Increased width to 70%
+    )
+
+    navbar_container = html.Div(navbar)  # Wrap navbar in its own container
 
     dash_app.layout = html.Div(
         className="container",
         children=[
-            html.Div(
-                className="left-section",
-                children=[
-                    html.Div(
-                        className="data-preview",
-                        children=[
-                            html.Div(
-                                className="data-preview-container",
-                                children=[
-                                    html.H2("Select Column"),
-                                    dcc.Dropdown(
-                                        id='column-dropdown',
-                                        options=[],
-                                        value=None,
-                                        placeholder="Select a column"
-                                    ),
-                                    html.Div(id="column-stats")  # Placeholder for stats
-                                ]
-                            )
-                        ]
-                    )
-                ],
-                style={'position': 'absolute', 'left': '0', 'top': '0', 'width': '50%', 'height': '100vh', 'overflowY': 'auto'}
-            ),
-            html.Div(
-                className="right-section",
-                children=[
-                    html.Div(
-                        className="data-visualization",
-                        children=[
-                            html.Div(
-                                className="data-visualization-container",
-                                children=[
-                                    html.H2("Plots and Stats"),
-                                    html.Div(id="column-plot")  # Placeholder for plot
-                                ]
-                            )
-                        ]
-                    )
-                ],
-                style={'position': 'absolute', 'right': '0', 'top': '0', 'width': '50%', 'height': '100vh', 'overflowY': 'auto'}
-            )
+            navbar_container,  # Add the navbar container here
+            html.Div([left_section, right_section], style={'display': 'flex', 'flexDirection': 'row'}),  # Wrap left and right sections in a container
         ],
-        style={"position": "relative"}
+        style={'display': 'flex', 'flexDirection': 'column', 'height': '100vh', 'backgroundColor': '#333333'}
     )
 
     return dash_app
+
 def update_stats_dash(dash_app, df):
     if df is not None and not df.empty:
         numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
@@ -125,7 +146,7 @@ def update_stats_dash(dash_app, df):
                 unique_values_str = f"Unique Values: {unique_values}"
 
                 # Concatenate all strings
-                stats_content = dcc.Markdown(f"**Main Statistics:**\n{stats_str}\n\n**Outliers:**\n{outliers_str}\n\n{unique_values_str}")
+                stats_content = dcc.Markdown(f"\n\n{stats_str}\n\n**Outliers:**\n\n{outliers_str}\n\n{unique_values_str}")
                 plot_content = dcc.Graph(figure=fig)
 
             return stats_content, plot_content
@@ -134,3 +155,4 @@ def update_stats_dash(dash_app, df):
         dash_app.layout = html.Div([
             html.H1("No Data Available", style={'color': '#FFFFFF'})
         ], style={'backgroundColor': '#333333'})
+

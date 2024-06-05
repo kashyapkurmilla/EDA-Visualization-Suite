@@ -47,11 +47,7 @@ def login():
             cursor.execute('SELECT * FROM login WHERE username = %s AND passwrd = %s', (username, password))
             account = cursor.fetchone()
             if account:
-                session['loggedin'] = True
-                session['id'] = account['id']
-                session['username'] = account['username']
-                msg = 'Logged in successfully!'
-                return render_template('landingpage.html')
+                return redirect(url_for('upload_data'))
             else:
                 msg = 'Incorrect username / password!'
             cursor.close()
@@ -124,6 +120,12 @@ def correlation():
 @app.route('/missingvalues', methods=['GET', 'POST'])
 def missingvalues():
     return redirect ('/dash/')
+
+
+@app.route('/describe', methods=['GET', 'POST'])
+def describe():
+    return redirect ('/stat/')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
