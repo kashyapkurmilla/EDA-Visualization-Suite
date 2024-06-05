@@ -84,6 +84,8 @@ def register():
 
 @app.route('/upload_data', methods=['GET', 'POST'])
 def upload_data():
+    if request.method=='GET':
+        return render_template('landingpage.html')
     if request.method == 'POST':
         if 'file' not in request.files:
             return redirect(request.url)
@@ -124,7 +126,7 @@ def missingvalues():
 
 @app.route('/describe', methods=['GET', 'POST'])
 def describe():
-    return redirect ('/stat/')
+    return redirect ('/statistics/')
 
 
 if __name__ == "__main__":
