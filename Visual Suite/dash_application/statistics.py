@@ -13,38 +13,9 @@ def create_stats_dash(flask_app):
         external_stylesheets=[dbc.themes.DARKLY]
     )
 
-    navbar = dbc.Navbar(
-        dbc.Container(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(html.Img(src="path/to/your/logo.png", height="30px")),
-                        dbc.Col(dbc.NavbarBrand("Dashboard", className="ml-2")),
-                    ],
-                    align="center",
-                    className="g-0",  # Remove gutters for full-width
-                ),
-                dbc.NavbarToggler(id="navbar-toggler"),
-                dbc.Collapse(
-                    dbc.Nav(
-                        [], className="ml-auto", navbar=True
-                    ),
-                    id="navbar-collapse",
-                    navbar=True,
-                ),
-            ],
-            fluid=True  # Make the container fluid for full-width
-        ),
-        color="dark",
-        dark=True,
-        className="mb-4",
-        style={'width':'100%'}
-    )
-
     dash_app.layout = html.Div(
         className="container",
         children=[
-            navbar,
             html.Div(
                 className="left-section",
                 children=[
@@ -67,7 +38,7 @@ def create_stats_dash(flask_app):
                         ]
                     )
                 ],
-                style={'position': 'absolute', 'left': '0', 'top': '60px', 'width': '50%', 'height': 'calc(100vh - 60px)', 'overflowY': 'auto'}
+                style={'position': 'absolute', 'left': '0', 'top': '0', 'width': '50%', 'height': '100vh', 'overflowY': 'auto'}
             ),
             html.Div(
                 className="right-section",
@@ -85,14 +56,13 @@ def create_stats_dash(flask_app):
                         ]
                     )
                 ],
-                style={'position': 'absolute', 'right': '0', 'top': '60px', 'width': '50%', 'height': 'calc(100vh - 60px)', 'overflowY': 'auto'}
+                style={'position': 'absolute', 'right': '0', 'top': '0', 'width': '50%', 'height': '100vh', 'overflowY': 'auto'}
             )
         ],
         style={"position": "relative"}
     )
 
     return dash_app
-
 def update_stats_dash(dash_app, df):
     if df is not None and not df.empty:
         numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
@@ -106,10 +76,10 @@ def update_stats_dash(dash_app, df):
             return options
     
         @dash_app.callback(
-            [Output('column-stats', 'children'),
-             Output('column-plot', 'children')],
-            Input('column-dropdown', 'value')
-        )
+        [Output('column-stats', 'children'),
+        Output('column-plot', 'children')],
+        Input('column-dropdown', 'value')
+            )
         def update_content(selected_column):
             print("Selected Column:", selected_column)  # Debugging line
 
@@ -123,7 +93,7 @@ def update_stats_dash(dash_app, df):
                 stats = df[selected_column].describe()
 
                 # Format each statistic into a string with a newline between them
-                stats_str = "\n".join([f"{stat_name}: {stat_value}" for stat_name, stat_value in stats.items()])
+                stats_str = "\n".join([f"{stat_name}: {stat_value}\n" for stat_name, stat_value in stats.items()])
 
                 # Remove the trailing newline character
                 stats_str = stats_str.rstrip("\n")
@@ -164,8 +134,3 @@ def update_stats_dash(dash_app, df):
         dash_app.layout = html.Div([
             html.H1("No Data Available", style={'color': '#FFFFFF'})
         ], style={'backgroundColor': '#333333'})
-
-# Example usage:
-# app = Flask(__name__)
-# dash_app = create_stats_dash(app)
-# update_stats_dash(dash_app, your_dataframe)
