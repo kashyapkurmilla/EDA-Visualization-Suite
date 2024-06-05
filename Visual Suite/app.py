@@ -119,11 +119,11 @@ def upload_data():
 
 @app.route('/correlation', methods=['GET', 'POST'])
 def correlation():
-    return redirect ('/dash1/')
+    return redirect ('/correlationmatrix/')
 
 @app.route('/missingvalues', methods=['GET', 'POST'])
 def missingvalues():
-    return redirect ('/dash/')
+    return redirect ('/missingvalue/')
 
 if __name__ == "__main__":
     app.run(debug=True)
