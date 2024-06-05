@@ -10,7 +10,7 @@ def create_missing_dash_application(flask_app):
     dash_app = dash.Dash(
         server=flask_app, 
         name="Dashboard", 
-        url_base_pathname="/dash/", 
+        url_base_pathname="/missingvalue", 
         external_stylesheets=[dbc.themes.DARKLY]
     )
 
@@ -23,8 +23,8 @@ def create_missing_dash_application(flask_app):
             ),
             dbc.Nav(
                 [
-                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
-                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix", style={'color': 'white'})),
                 ],
                 className="ml-auto",
             ),
@@ -113,7 +113,7 @@ def create_cm_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app, 
         name="Dashboard", 
-        url_base_pathname="/dash1/", 
+        url_base_pathname="/correlationmatrix", 
         external_stylesheets=[dbc.themes.DARKLY]
     )
 
@@ -126,8 +126,8 @@ def create_cm_dash(flask_app):
             ),
             dbc.Nav(
                 [
-                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
-                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix", style={'color': 'white'})),
                 ],
                 className="ml-auto",
             ),
@@ -242,8 +242,8 @@ def update_cm_dash(dash_app, df):
                 ),
                 dbc.Nav(
                     [
-                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dash/", style={'color': 'white'})),
-                        dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/dash1/", style={'color': 'white'})),
+                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue", style={'color': 'white'})),
+                        dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix", style={'color': 'white'})),
                     ],
                     className="ml-auto",
                 ),
