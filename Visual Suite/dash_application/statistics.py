@@ -9,7 +9,7 @@ def create_stats_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app,
         name="Dashboard",
-        url_base_pathname="/stats/",
+        url_base_pathname="/statistics/",
         external_stylesheets=[dbc.themes.DARKLY]
     )
 
@@ -74,62 +74,84 @@ def create_stats_dash(flask_app):
             unique_values_str = f"Unique Values: {unique_values}"
 
             # Concatenate all strings
-            stats_content = dcc.Markdown(f"**Main Statistics:**\n{stats_str}\n\n**Outliers:**\n{outliers_str}\n\n{unique_values_str}")
-            plot_content = dcc.Graph(figure=fig)
+            stats_content = dcc.Markdown(f"\n{stats_str}\n\n**Outliers:**\n{outliers_str}\n\n{unique_values_str}")
+            plot_content = dcc.Graph(figure=fig, style={'width': '100%', 'height': '100%'})  # Adjusted graph size
 
         return stats_content, plot_content
 
+    navbar = dbc.Navbar(
+        [
+            dbc.NavbarBrand(
+                html.Img(src="/static/images/heading.png", height="70px"),
+                className="me-auto",
+                style={'margin-right': '20px'}
+            )
+        ],
+        color="dark",
+        dark=True,
+        className='bg-dark'
+    )
+
+    navbar_container = html.Div(navbar)
+
     dash_app.layout = html.Div(
-        className="container",
         children=[
+            navbar_container,
             html.Div(
-                className="left-section",
+                className="container",
                 children=[
                     html.Div(
-                        className="data-preview",
+                        className="left-section",
                         children=[
                             html.Div(
-                                className="data-preview-container",
+                                className="data-preview",
                                 children=[
-                                    html.H2("Select Column"),
-                                    dcc.Dropdown(
-                                        id='column-dropdown',
-                                        options=[],
-                                        value=None,
-                                        placeholder="Select a column"
-                                    ),
-                                    html.Div(id="column-stats")  # Placeholder for stats
+                                    html.Div(
+                                        className="data-preview-container",
+                                        children=[
+                                            html.H3("Column Statistics", style={'font-size': '30px'}),
+                                            dcc.Dropdown(
+                                                id='column-dropdown',
+                                                options=[],
+                                                value=None,
+                                                placeholder="Select a column",
+                                                style={'backgroundColor': '#888888', 'color': '#000000', 'font-size': '22px'}
+                                            ),
+                                            html.Div(id="column-stats", style={'font-size': '22px'})
+                                        ]
+                                    )
                                 ]
                             )
-                        ]
-                    )
-                ],
-                style={'width': '30%'}  # Adjusted width
-            ),
-            html.Div(
-                className="right-section",
-                children=[
+                        ],
+                        style={'width': '35%', 'padding-right': '10px', 'height': 'calc(100vh - 70px)', 'overflowY': 'auto'}  # Adjusted width and height
+                    ),
                     html.Div(
-                        className="data-visualization",
+                        className="right-section",
                         children=[
                             html.Div(
-                                className="data-visualization-container",
+                                className="data-visualization",
                                 children=[
-                                    html.H2("Plots and Stats"),
-                                    html.Div(id="column-plot")  # Placeholder for plot
+                                    html.Div(
+                                        className="data-visualization-container",
+                                        children=[
+                                            html.Div(id="column-plot", style={'width': '100%', 'height': '100%'})  # Adjusted graph size
+                                        ]
+                                    )
                                 ]
                             )
-                        ]
+                        ],
+                        style={'width': '65%', 'padding-left': '10px', 'height': 'calc(100vh - 70px)', 'overflowY': 'auto'}  # Adjusted width and height
                     )
                 ],
-                style={'width': '85%'}  # Adjusted width
+                style={'display': 'flex', 'flexDirection': 'row'}
             ),
             dcc.Store(id='stored-data')
         ],
-        style={"position": "relative"}
+        style={'width': '100%', 'backgroundColor': '#333333'}
     )
 
     return dash_app
+
 def update_stats_dash(dash_app, df):
     if df is not None and not df.empty:
         numeric_columns = df.select_dtypes(include=['number'])
@@ -137,7 +159,6 @@ def update_stats_dash(dash_app, df):
 
         dropdown_options = [{'label': col, 'value': col} for col in column_names]
 
-        # Define left and right sections
         left_section = html.Div(
             className="left-section",
             children=[
@@ -147,68 +168,70 @@ def update_stats_dash(dash_app, df):
                         html.Div(
                             className="data-preview-container",
                             children=[
-                                html.H3("Column Statistics"),
+                                html.H3("Column Statistics", style={'font-size': '30px'}),
                                 dcc.Dropdown(
                                     id='column-dropdown',
                                     options=dropdown_options,
                                     value=None,
                                     placeholder="Select a column",
-                                    style={'backgroundColor': '#888888', 'color': '#000000'}
+                                    style={'backgroundColor': '#888888', 'color': '#000000', 'font-size': '22px'}
                                 ),
-                                html.Div(id="column-stats")  # Placeholder for stats
+                                html.Div(id="column-stats", style={'font-size': '22px'})
                             ]
                         )
                     ]
                 )
             ],
-            style={'width': '30%'}  # Reduced width to 30%
+            style={'width': '35%', 'padding-right': '10px', 'height': 'calc(100vh - 70px)', 'overflowY': 'auto'}  # Adjusted width and height
         )
 
         right_section = html.Div(
-            className="right-section",
+    className="right-section",
+    children=[
+        html.Div(
+            className="data-visualization",
             children=[
                 html.Div(
-                    className="data-visualization",
+                    className="data-visualization-container",
                     children=[
-                        html.Div(
-                            className="data-visualization-container",
-                            children=[
-                                html.Div(id="column-plot")  # Placeholder for plot
-                            ]
-                        )
+                        html.Div(id="column-plot", style={'width': '100%', 'height': '100%'})  # Adjusted width and height
                     ]
                 )
-            ],
-            style={'width': '70%'}  # Increased width to 70%
+            ]
         )
+    ],
+    style={'width': '85%', 'padding-left': '10px', 'height': '100vh', 'overflowY': 'auto'}  # Adjusted width and height
+)
 
-        # Define the navbar
+
+
+
         navbar = dbc.Navbar(
             [
                 dbc.NavbarBrand(
                     html.Img(src="/static/images/heading.png", height="70px"),
                     className="me-auto",
-                    style={'margin-right': '20px'}  # Add margin-right here
+                    style={'margin-right': '20px'}
                 )
             ],
-            color="dark",  # Use the 'dark' color theme
+            color="dark",
             dark=True,
             className='bg-dark'
         )
 
-        navbar_container = html.Div(navbar)  # Wrap navbar in its own container
+        navbar_container = html.Div(navbar)
 
         dash_app.layout = html.Div(
             children=[
-                navbar_container,  # Add the navbar container here
+                navbar_container,
                 html.Div(
                     className="container",
                     children=[
                         html.Div(
                             children=[left_section, right_section],
-                            style={'display': 'flex', 'flexDirection': 'row'}  # Wrap left and right sections in a container
+                            style={'display': 'flex', 'flexDirection': 'row', 'height': 'calc(100vh - 70px)'}
                         ),
-                        dcc.Store(id='stored-data', data=df.to_json(orient='split'))  # Store the DataFrame in client-side storage
+                        dcc.Store(id='stored-data', data=df.to_json(orient='split'))
                     ],
                     style={'display': 'flex', 'flexDirection': 'column', 'height': '100vh', 'backgroundColor': '#333333'}
                 )
@@ -221,4 +244,6 @@ def update_stats_dash(dash_app, df):
         ], style={'backgroundColor': '#333333'})
 
     return dash_app
+
+
 
