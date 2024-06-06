@@ -1,11 +1,15 @@
 import dash
-from dash import dcc, html
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
 import plotly.figure_factory as ff
-
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output,State
+import plotly.graph_objs as go
+import dash_bootstrap_components as dbc
 def create_missing_dash_application(flask_app):
     dash_app = dash.Dash(
         server=flask_app, 
@@ -60,6 +64,7 @@ def create_missing_dash_application(flask_app):
     return dash_app
 
 def update_dash_app(dash_app, df):  
+    print("DataFrame Present:",df.columns[2])
     if df is not None and not df.empty:
         non_missing_values = df.notnull().sum()
         non_missing_df = pd.DataFrame({'Column': non_missing_values.index, 'Non-Missing Values': non_missing_values.values})
@@ -109,6 +114,7 @@ def update_dash_app(dash_app, df):
 
         dash_app.layout = layout
 
+
 def create_cm_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app, 
@@ -122,7 +128,7 @@ def create_cm_dash(flask_app):
             dbc.NavbarBrand(
                 html.Img(src="/static/images/heading.png", height="70px"),
                 className="me-auto",
-                style={'margin-right': '20px'}  # Add margin-right here
+                style={'margin-right': '20px'}
             ),
             dbc.Nav(
                 [
@@ -132,7 +138,7 @@ def create_cm_dash(flask_app):
                 className="ml-auto",
             ),
         ],
-        color="dark",  # Use the 'dark' color theme
+        color="dark",
         dark=True,
         className='bg-dark'
     )
@@ -149,20 +155,64 @@ def create_cm_dash(flask_app):
             dcc.Dropdown(
                 id='dropdown1',
                 value=None,
-                placeholder="Select column"
+                placeholder="Select column",
+                style={'margin-bottom': '10px'}
             ),
             dcc.Dropdown(
                 id='dropdown2',
                 value=None,
                 placeholder="Select column"
             ),
-        ], style={'width': '50%', 'display': 'inline-block'}),
+        ], style={'width': '50%', 'margin': '0 auto', 'display': 'flex', 'flexDirection': 'column'}),
         dcc.Graph(id='heatmap', 
-                  figure={'layout': {'plot_bgcolor': colors['background'], 'paper_bgcolor': colors['background'], 'font': {'color': colors['text']}}}
-        )
+                  figure={'layout': {'plot_bgcolor': colors['background'], 'paper_bgcolor': colors['background'], 'font': {'color': colors['text']}}},
+                  style={'height': '600px'}  # Set the height of the heatmap
+        ),
+        dcc.Store(id='stored-data')
     ], style={'backgroundColor': colors['background']})
 
     dash_app.layout = layout
+
+    @dash_app.callback(
+        Output('heatmap', 'figure'),
+        [Input('dropdown1', 'value'), Input('dropdown2', 'value')],
+        State('stored-data', 'data')
+    )
+    def update_heatmap(column1, column2, data):
+        if column1 is None or column2 is None:
+            raise dash.exceptions.PreventUpdate
+
+        df = pd.read_json(data, orient='split')
+        selected_correlation_matrix = df[[column1, column2]].corr()
+        x = [column1, column2]
+        y = [column1, column2]
+
+        fig = go.Figure(data=go.Heatmap(
+            z=selected_correlation_matrix.values,
+            x=x,
+            y=y,
+            colorscale=[
+                [0, 'grey'],
+                [0.5, '#FFE600'],
+                [1, 'grey']
+            ],
+            showscale=True,
+            colorbar=dict(title='Correlation'),
+            text=selected_correlation_matrix.values,
+            texttemplate="%{text:.2f}",
+            hoverinfo='text',
+            zmid=0  # Add midpoint for the color scale
+        ))
+        fig.update_layout(
+            height=600,  # Set the height of the heatmap
+            plot_bgcolor='#333333',
+            paper_bgcolor='#333333',
+            font=dict(color='white'),
+            xaxis=dict(tickfont=dict(color='white')),
+            yaxis=dict(tickfont=dict(color='white')),
+        )
+        return fig
+
     return dash_app
 
 def update_cm_dash(dash_app, df):
@@ -171,92 +221,66 @@ def update_cm_dash(dash_app, df):
         correlation_matrix = numeric_columns.corr()
         column_names = correlation_matrix.columns.tolist()
 
-        dropdown1 = dcc.Dropdown(
-            id='dropdown1',
-            value=None,
-            options=[{'label': col, 'value': col} for col in column_names],
-            placeholder="Select column",
-            style={'color': 'black'}
-        )
+        dropdown1_options = [{'label': col, 'value': col} for col in column_names]
+        dropdown2_options = dropdown1_options
 
-        dropdown2 = dcc.Dropdown(
-            id='dropdown2',
-            value=None,
-            options=[{'label': col, 'value': col} for col in column_names],
-            placeholder="Select column",
-            style={'color': 'black'}
-        )
-
-        heatmap = dcc.Graph(id='heatmap')
-
-        @dash_app.callback(
-            [Output('dropdown1', 'options'),
-             Output('dropdown2', 'options')],
-            [Input('dropdown1', 'value'),
-             Input('dropdown2', 'value')]
-        )
-        def update_dropdowns(selected_column1, selected_column2):
-            options = [{'label': col, 'value': col} for col in column_names]
-            return options, options
-
-        @dash_app.callback(
-            Output('heatmap', 'figure'),
-            [Input('dropdown1', 'value'),
-             Input('dropdown2', 'value')]
-        )
-        def update_heatmap(column1, column2):
-            if column1 is None or column2 is None:
-                selected_correlation_matrix = correlation_matrix
-                x = column_names
-                y = column_names
-            else:
-                selected_correlation_matrix = df[[column1, column2]].corr()
-                x = [column1, column2]
-                y = [column1, column2]
-
-            fig = ff.create_annotated_heatmap(
-                z=selected_correlation_matrix.values,
-                x=x,
-                y=y,
-                colorscale=[[0, 'grey'], [0.5, '#FFE600'], [1, 'grey']],  # Yellow-Orange-Red palette
-                showscale=True,
-                annotation_text=selected_correlation_matrix.values.round(2),
-                hoverinfo='z',
-                xgap=1, ygap=1,
-                font_colors=['white']  # Set text color to white
-            )
-            fig.update_layout(
-                plot_bgcolor='#333333',
-                paper_bgcolor='#333333',
-                xaxis=dict(tickfont=dict(color='white')),  # Set x-axis text color to white
-                yaxis=dict(tickfont=dict(color='white'))   # Set y-axis text color to white
-            )
-            return fig
-
-        navbar = dbc.Navbar(
-            [
-                dbc.NavbarBrand(
-                    html.Img(src="/static/images/heading.png", height="70px"),
-                    className="me-auto",
-                    style={'margin-right': '20px'}  # Add margin-right here
-                ),
-                dbc.Nav(
-                    [
-                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue/", style={'color': 'white'})),
-                        dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix/", style={'color': 'white'})),
-                    ],
-                    className="ml-auto",
-                ),
-            ],
-            color="dark",  # Use the 'dark' color theme
-            dark=True,
-            className='bg-dark'
-        )
-
-        # Update the layout with the new structure
         dash_app.layout = html.Div([
-            navbar,
+            dash_app.layout.children[0],  # navbar
             html.H1("Correlation Matrix", style={'color': '#FFFFFF'}),
-            html.Div([dropdown1, dropdown2], style={'width': '50%', 'display': 'inline-block'}),
-            heatmap
+            html.Div([
+                dcc.Dropdown(
+                    id='dropdown1',
+                    options=dropdown1_options,
+                    value=None,
+                    placeholder="Select column",
+                    style={'color': 'black', 'margin-bottom': '10px'}
+                ),
+                dcc.Dropdown(
+                    id='dropdown2',
+                    options=dropdown2_options,
+                    value=None,
+                    placeholder="Select column",
+                    style={'color': 'black'}
+                ),
+            ], style={'width': '50%', 'margin': '0 auto', 'display': 'flex', 'flexDirection': 'column'}),
+            dcc.Graph(id='heatmap',
+                      figure={
+                          'data': [
+                              go.Heatmap(
+                                  z=correlation_matrix.values,
+                                  x=column_names,
+                                  y=column_names,
+                                  colorscale=[
+                                      [0, 'grey'],
+                                      [0.5, '#FFE600'],
+                                      [1, 'grey']
+                                  ],
+                                  showscale=True,
+                                  colorbar=dict(title='Correlation'),
+                                  text=correlation_matrix.values,
+                                  texttemplate="%{text:.2f}",
+                                  hoverinfo='text',
+                                  zmid=0  # Add midpoint for the color scale
+                              )
+                          ],
+                          'layout': {
+                              'height': 600,  # Set the height of the heatmap
+                              'plot_bgcolor': '#333333',
+                              'paper_bgcolor': '#333333',
+                              'font': {'color': 'white'},
+                              'xaxis': {'tickfont': {'color': 'white'}},
+                              'yaxis': {'tickfont': {'color': 'white'}},
+                          }
+                      },
+                      style={'height': '600px'}  # Set the height of the heatmap
+            ),
+            dcc.Store(id='stored-data', data=df.to_json(orient='split'))  # Store the DataFrame in client-side storage
         ], style={'backgroundColor': '#333333'})
+
+    else:
+        dash_app.layout = html.Div([
+            dash_app.layout.children[0],  # navbar
+            html.H1("No Data Available", style={'color': '#FFFFFF'})
+        ], style={'backgroundColor': '#333333'})
+
+    return dash_app
