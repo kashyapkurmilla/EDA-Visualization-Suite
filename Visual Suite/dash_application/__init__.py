@@ -114,7 +114,6 @@ def update_dash_app(dash_app, df):
 
         dash_app.layout = layout
 
-
 def create_cm_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app, 
@@ -179,16 +178,21 @@ def create_cm_dash(flask_app):
         State('stored-data', 'data')
     )
     def update_heatmap(column1, column2, data):
-        if column1 is None or column2 is None:
-            raise dash.exceptions.PreventUpdate
-
         df = pd.read_json(data, orient='split')
-        selected_correlation_matrix = df[[column1, column2]].corr()
-        x = [column1, column2]
-        y = [column1, column2]
+        if column1 is None and column2 is None:
+            numeric_columns = df.select_dtypes(include=['number'])
+            correlation_matrix = numeric_columns.corr()
+            x = correlation_matrix.columns.tolist()
+            y = correlation_matrix.index.tolist()
+            z = correlation_matrix.values
+        else:
+            selected_correlation_matrix = df[[column1, column2]].corr()
+            x = [column1, column2]
+            y = [column1, column2]
+            z = selected_correlation_matrix.values
 
         fig = go.Figure(data=go.Heatmap(
-            z=selected_correlation_matrix.values,
+            z=z,
             x=x,
             y=y,
             colorscale=[
@@ -198,14 +202,14 @@ def create_cm_dash(flask_app):
             ],
             showscale=True,
             colorbar=dict(title='Correlation'),
-            text=selected_correlation_matrix.values,
+            text=z,
             texttemplate="%{text:.2f}",
             hoverinfo='text',
             zmid=0  # Add midpoint for the color scale
         ))
         fig.update_layout(
             height=600,  # Set the height of the heatmap
-            plot_bgcolor='#333333',
+            plot_bgcolor='black',
             paper_bgcolor='#333333',
             font=dict(color='white'),
             xaxis=dict(tickfont=dict(color='white')),
