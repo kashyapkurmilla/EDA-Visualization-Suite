@@ -1,0 +1,10 @@
+__pycache__/
+__pycache__
+*.py[cod]
+*.egg
+*.egg-info/
+.venv
+env/
+venv/
+/Visual\ Suite/__pycache__
+/Visual\ Suite/__pycache__/
