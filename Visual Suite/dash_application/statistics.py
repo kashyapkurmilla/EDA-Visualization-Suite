@@ -7,6 +7,7 @@ from dash.dependencies import Input, Output, State
 from dash import dcc
 import seaborn as sns
 
+
 def create_stats_dash(flask_app):
     dash_app = dash.Dash(
         server=flask_app,

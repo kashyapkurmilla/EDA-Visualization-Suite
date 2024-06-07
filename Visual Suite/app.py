@@ -11,7 +11,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = "sessionkey1"
 
-#
+
 dash_app1 = create_missing_dash_application(app)
 dash_app2 = create_cm_dash(app)
 dash_app3 = create_stats_dash(app)
