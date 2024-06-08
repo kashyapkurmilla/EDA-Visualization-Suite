@@ -212,3 +212,51 @@ th {
 ::-webkit-scrollbar-thumb:hover {
     background-color: #3d3d3d; /* Slightly lighter on hover */
 }
+
+.preprocess-visualization-container {
+    background-color: #262626; 
+    padding: 20px; 
+    border-radius: 12px; 
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    overflow-x: auto;
+    margin: auto;
+    height: 75vh; /* height */
+    overflow-y: auto; 
+}
+
+#preprocess-form {
+    margin: 20px auto;
+    display: inline-block;
+    text-align: left;
+}
+
+/* Style the checkboxes and labels */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.checkbox-container input {
+    margin-right: 10px;
+}
+
+.checkbox-container label {
+    font-size: 1.2em;
+}
+
+/* Style the submit button */
+#preprocess-form input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+#preprocess-form input[type="submit"]:hover {
+    background-color: #45a049;
+}
