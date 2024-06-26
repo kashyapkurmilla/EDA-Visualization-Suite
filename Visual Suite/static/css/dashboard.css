@@ -1,0 +1,200 @@
+/* CSS styles for the navbar and dropdowns */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333333;
+    padding: 15px 10px;
+    /* Increased top padding for more space */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-right: 100px;
+}
+
+.navbar img {
+    max-width: 50px;
+    height: auto;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropbtn-text {
+    margin-right: 5px;
+    margin-left: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.dropbtn-text::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #FFB400;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+    z-index: 1;
+}
+
+.dropbtn-text:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #262626;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    border-radius: 8px;
+    top: 100%;
+    margin-top: 5px;
+}
+
+.dropdown-content a {
+    color: #ffffff;
+    padding: 8px 10px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #3d3d3d;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Styles for the table */
+
+.column-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    /* Adjusted margin-top for better spacing */
+}
+
+.column-info-table th,
+.column-info-table td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    /* Reduced padding for compactness */
+    text-align: left;
+}
+
+.column-info-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    padding: 10px;
+    /* Adjusted padding for table header */
+}
+
+.column-info-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.column-info-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* General styles */
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1800px;
+    margin: 80px auto 0;
+    padding: 20px;
+}
+
+.dashboard-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.column-info,
+.visualizations {
+    flex: 0 0 calc(25% - 20px); /* Adjusted width for column-info */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+}
+
+.visualizations {
+    flex: 1; /* Full width for visualization */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px 20px; /* Adjusted margin for visualization */
+}
+
+.visualization {
+    min-height: 600px; /* Adjusted minimum height for visualization */
+}
+
+#column-name {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Highlight style */
+.highlighted {
+    background-color: #f0f0f0;
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 768px) {
+    .nav {
+        margin-right: 20px;
+    }
+
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .column-info,
+    .visualizations {
+        margin-left: 0;
+        margin-bottom: 20px;
+        flex: 1 0 100%; /* Full width for smaller screens */
+    }
+}

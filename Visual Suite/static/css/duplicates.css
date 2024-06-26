@@ -1,0 +1,288 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f3f2f1;
+    color: #212121;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333333;
+    padding: 8px 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar img {
+    max-width: 40px;
+    height: auto;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.navbar-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 10px;
+    transition: opacity 0.3s ease;
+}
+
+.navbar-links a:hover {
+    opacity: 0.8;
+}
+
+.dropbtn-text {
+    font-size: 14px;
+    cursor: pointer;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.dropbtn-text::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #FFB400;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+    z-index: 1;
+}
+
+.dropbtn-text:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #262626;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    border-radius: 8px;
+    top: 100%;
+    margin-top: 5px;
+}
+
+.dropdown-content a {
+    color: #ffffff;
+    padding: 8px 10px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #3d3d3d;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.container {
+    max-width: 800px;
+    margin: 80px auto 40px;
+    background-color: #f3f2f1;
+    padding: 10px; /* Reduced padding */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.container.full-width {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.container-title {
+    color: #212121;
+    margin-bottom: 15px; /* Reduced margin */
+    font-size: 20px; /* Reduced font-size */
+    font-weight: 500;
+}
+
+.input-section {
+    margin-bottom: 15px; /* Reduced margin */
+    padding: 15px; /* Reduced padding */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.output-section {
+    margin-top: 20px; /* Reduced margin */
+}
+
+.radio-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px; /* Reduced margin */
+}
+
+.radio-container input[type="radio"] {
+    display: none;
+}
+
+.radio-container label {
+    display: inline-block;
+    padding: 6px 12px; /* Reduced padding */
+    background-color: #fff;
+    color: #212121;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 5px; /* Reduced margin */
+}
+
+.radio-container input[type="radio"]:checked + label {
+    background-color: #ffcc29;
+    border-color: #ffcc29;
+    color: #212121;
+}
+
+#remove-options {
+    margin-top: 5px; /* Reduced margin */
+}
+
+.select-container {
+    margin-bottom: 15px; /* Reduced margin */
+    text-align: left;
+}
+
+.select-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.select-container select {
+    width: 100%;
+    padding: 8px; /* Reduced padding */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #212121;
+    font-size: 14px; /* Reduced font-size */
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 8px; /* Reduced padding */
+    border: none;
+    border-radius: 5px;
+    background-color: #ffcc29;
+    color: #212121;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #ffb400;
+}
+
+.output-container {
+    background-color: #fff;
+    color: #212121;
+    padding: 15px; /* Reduced padding */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    text-align: left;
+}
+
+.output-container h3 {
+    margin-top: 0;
+    font-size: 16px; /* Reduced font-size */
+    font-weight: 500;
+}
+
+.output-container ul {
+    padding-left: 15px; /* Reduced padding */
+}
+
+.output-container ul li {
+    list-style-type: none;
+    margin-bottom: 5px; /* Reduced margin */
+}
+
+.data-table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px; /* Reduced margin */
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #ccc;
+    padding: 6px; /* Reduced padding */
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #212121;
+    color: #fff;
+}
+
+.data-table td {
+    background-color: #fff;
+    color: #212121;
+}
+
+.data-table tr:nth-child(even) td {
+    background-color: #f3f2f1;
+}
+
+/* Updated styles for displaying duplicates in two columns */
+.duplicate-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Two columns */
+    gap: 5px; /* Reduced gap */
+}
+
+.duplicate-item {
+    padding: 5px;
+}
+
+@media (max-width: 768px) {
+    .duplicate-grid {
+        grid-template-columns: 1fr;
+    }
+}

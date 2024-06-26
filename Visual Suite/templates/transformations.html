@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preprocess Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transformations.css') }}">
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+</head>
+<body>
+    <div class="navbar">
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
+        <div class="nav">
+            <div class="dropdown">
+                <span class="dropbtn-text">Actions</span>
+                <div class="dropdown-content">
+                    <a href="#">Show or Hide Columns</a>
+                    <a href="#">Dataframe Functions</a>
+                    <a href="#">Summarize Data</a>
+                    <a href="#">Feature Analysis</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Visualize</span>
+                <div class="dropdown-content">
+                    <a href="/statistics/">Describe</a>
+                    <a href="#">Duplicates</a>
+                    <a href="/missingvalue/">Missing Analysis</a>
+                    <a href="/correlationmatrix/">Co-Relations</a>
+                    <a href="#">Charts</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Pre-Processing</span>
+                <div class="dropdown-content">
+                    <!-- <a href="#">Charts</a>
+                    <a href="#">Graphs</a> -->
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Regression</span>
+                <div class="dropdown-content">
+                    <a href="#">Linear Regression</a>
+                    <a href="#">Model Accuracy</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Report</span>
+                <div class="dropdown-content">
+                    <a href="#">Generate Report</a>
+                    <a href="#">Export Data</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <span class="dropbtn-text">Settings</span>
+                <div class="dropdown-content">
+                    <a href="#">Preferences</a>
+                    <a href="#">User Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="header-container">
+            <h1>Preprocess Data</h1>
+            <form action="{{ url_for('transformations') }}" method="POST" id="preprocess-form">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="log-transformation-checkbox" name="log_transformation" {% if log_transformation_checked %}checked{% endif %} value="Log-Transformation">
+                    <label for="log-transformation-checkbox">Log Transformation</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="box-cox-transformation-checkbox" name="box_cox_transformation" {% if box_cox_transformation_checked %}checked{% endif %} value="Box-Cox-Transformation">
+                    <label for="box-cox-transformation-checkbox">Box-Cox Transformation</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="standardization-checkbox" name="standardization" {% if standardization_checked %}checked{% endif %} value="Standardization">
+                    <label for="standardization-checkbox">Standardization</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="normalization-checkbox" name="normalization" {% if normalization_checked %}checked{% endif %} value="Normalization">
+                    <label for="normalization-checkbox">Normalization</label>
+                </div>
+                <div class="select-container">
+                    <label for="one-hot-column">Select Column for One-Hot Encoding:</label>
+                    <select id="one-hot-column" name="one_hot_column">
+                        <option value="">--Select Column--</option>
+                        {% for column in columns %}
+                            <option value="{{ column }}" {% if column == selected_one_hot_column %}selected{% endif %}>{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="select-container">
+                    <label for="label-column">Select Column for Label Encoding:</label>
+                    <select id="label-column" name="label_column">
+                        <option value="">--Select Column--</option>
+                        {% for column in columns %}
+                            <option value="{{ column }}" {% if column == selected_label_column %}selected{% endif %}>{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" id="apply-button-clicked" name="apply_button_clicked" value="false">
+                <input type="submit" value="Apply" onclick="document.getElementById('apply-button-clicked').value='true';" class="apply-button">
+            </form>
+        </div>
+    </div>
+    
+    <div class="preprocess-visualization-container">
+        <div class="data-table" id="data-table">
+            {% if df %}
+                {{ df|safe }}
+            {% else %}
+                <p>No data to display.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Add event listeners to checkboxes
+        document.getElementById("log-transformation-checkbox").addEventListener("change", function() {
+            document.getElementById("apply-button-clicked").value = "false";
+            document.getElementById("preprocess-form").submit();
+        });
+        document.getElementById("box-cox-transformation-checkbox").addEventListener("change", function() {
+            document.getElementById("apply-button-clicked").value = "false";
+            document.getElementById("preprocess-form").submit();
+        });
+        document.getElementById("standardization-checkbox").addEventListener("change", function() {
+            document.getElementById("apply-button-clicked").value = "false";
+            document.getElementById("preprocess-form").submit();
+        });
+        document.getElementById("normalization-checkbox").addEventListener("change", function() {
+            document.getElementById("apply-button-clicked").value = "false";
+            document.getElementById("preprocess-form").submit();
+        });
+        document.getElementById("one-hot-column").addEventListener("change", function() {
+            document.getElementById("apply-button-clicked").value = "false";
+            document.getElementById("preprocess-form").submit();
+        });
+        document.getElementById("label-column").addEventListener("change", function() {
+            document.getElementById("apply-button-clicked").value = "false";
+            document.getElementById("preprocess-form").submit();
+        });
+    </script>
+</body>
+</html>

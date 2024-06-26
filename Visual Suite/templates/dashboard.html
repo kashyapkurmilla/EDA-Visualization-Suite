@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EDA Visualization Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
+        <div class="nav">
+            <div class="dropdown">
+                <span class="dropbtn-text">Actions</span>
+                <div class="dropdown-content">
+                    <a href="#">Show or Hide Columns</a>
+                    <a href="#">Dataframe Functions</a>
+                    <a href="#">Summarize Data</a>
+                    <a href="#">Feature Analysis</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Visualize</span>
+                <div class="dropdown-content">
+                    <a href="/describe">Describe</a>
+                    <a href="/missingvalue/">Missing Analysis</a>
+                    <a href="/correlationmatrix/">Co-Relations</a>
+                    <a href="/charts">Charts</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Pre-Processing</span>
+                <div class="dropdown-content">
+                    <a href="/transformations">Feature Engineering</a>
+                    <a href="/duplicates/">Duplicates</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Regression</span>
+                <div class="dropdown-content">
+                    <a href="#">Linear Regression</a>
+                    <a href="#">Model Accuracy</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Report</span>
+                <div class="dropdown-content">
+                    <a href="#">Generate Report</a>
+                    <a href="#">Export Data</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Settings</span>
+                <div class="dropdown-content">
+                    <a href="#">Preferences</a>
+                    <a href="#">User Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="dashboard-container">
+            <!-- Column Information -->
+            <div class="column-info">
+                <h2>Column Summary</h2>
+                <table class="column-info-table">
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Number of Rows</th>
+                            <th>Data Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for column in columns_info %}
+                        <tr class="column-row" data-column="{{ column.name }}">
+                            <td>{{ column.name }}</td>
+                            <td>{{ column.num_rows }}</td>
+                            <td>{{ column.dtype }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Visualization Section -->
+            <div class="visualizations">
+                <h2>Visualization</h2>
+                <div id="column-name" style="text-align: left; font-size: 20px; font-weight: bold; margin-bottom: 10px;"></div>
+                <div id="column-viz" style="width: 100%; height: 600px;">
+                    {% if initial_viz %}
+                        {{ initial_viz | safe }}
+                    {% else %}
+                        <p>No numeric columns available for visualization.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Function to update visualization
+            function updateVisualization(selectedColumn) {
+                $.ajax({
+                    url: '/get_visualization',
+                    method: 'POST',
+                    data: { column: selectedColumn },
+                    success: function (response) {
+                        $('#column-name').text(selectedColumn); // Set the column name
+                        $('#column-viz').html(response.visualization);
+                        // After updating the content, adjust the graph size
+                        var graphDiv = document.getElementById('column-viz').getElementsByTagName('div')[0];
+                        Plotly.relayout(graphDiv, {
+                            width: $('#column-viz').width(),
+                            height: $('#column-viz').height()
+                        });
+                    },
+                    error: function (err) {
+                        console.error('Error fetching visualization:', err);
+                    }
+                });
+            }
+
+            // Handle click on column row in the table
+            $('.column-row').click(function () {
+                // Remove previous highlighted class
+                $('.column-row').removeClass('highlighted');
+                // Add highlight to the clicked row
+                $(this).addClass('highlighted');
+
+                var selectedColumn = $(this).data('column');
+                updateVisualization(selectedColumn);
+            });
+
+            // Trigger initial visualization update based on the first column
+            var initialColumn = "{{ initial_column }}";
+            updateVisualization(initialColumn);
+        });
+
+    </script>
+
+</body>
+
+</html>

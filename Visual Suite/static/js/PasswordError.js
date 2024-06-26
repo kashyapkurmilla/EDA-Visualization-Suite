@@ -1,8 +1,3 @@
-function DataViz(){
-    window.location.href = '/data_viz';
-}
-
-
 function validateForm() {
     const password = document.getElementById('password').value;
     const rePassword = document.getElementById('re_password').value;

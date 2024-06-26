@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/charts.css') }}">
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    
+    <div class="navbar">
+        <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
+        <div class="nav">
+            <div class="dropdown">
+                <span class="dropbtn-text">Actions</span>
+                <div class="dropdown-content">
+                    <a href="#">Show or Hide Columns</a>
+                    <a href="#">Dataframe Functions</a>
+                    <a href="#">Summarize Data</a>
+                    <a href="#">Feature Analysis</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Visualize</span>
+                <div class="dropdown-content">
+                    <a href="/statistics/">Describe</a>
+                    <a href="#">Duplicates</a>
+                    <a href="/missingvalue/">Missing Analysis</a>
+                    <a href="/correlationmatrix/">Co-Relations</a>
+                    <a href="#">Charts</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Pre-Processing</span>
+                <div class="dropdown-content">
+                    <!-- <a href="#">Charts</a>
+                    <a href="#">Graphs</a> -->
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Regression</span>
+                <div class="dropdown-content">
+                    <a href="#">Linear Regression</a>
+                    <a href="#">Model Accuracy</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Report</span>
+                <div class="dropdown-content">
+                    <a href="#">Generate Report</a>
+                    <a href="#">Export Data</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span class="dropbtn-text">Settings</span>
+                <div class="dropdown-content">
+                    <a href="#">Preferences</a>
+                    <a href="#">User Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1>Create Chart</h1>
+        <form method="POST">
+            <div class="select-container">
+            <label for="x_axis">X Axis:</label>
+            <select name="x_axis" id="x_axis">
+                {% for column in columns %}
+                    <option value="{{ column }}">{{ column }}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <br>
+            <div class="select-container">
+            <label for="y_axis">Y Axis:</label>
+            <select name="y_axis" id="y_axis">
+                {% for column in columns %}
+                    <option value="{{ column }}">{{ column }}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <br>
+            <div class="select-container">
+            <label for="chart_type">Chart Type:</label>
+            <select name="chart_type" id="chart_type">
+                <option value="line">Line Chart</option>
+                <option value="bar">Bar Chart</option>
+                <option value="scatter">Scatter Plot</option>
+            </select>
+            </div>
+            <br>
+
+            <button type="submit" class="apply-button">Generate Chart</button>
+        </form>
+        <h1>
+            Chart:
+        </h1>
+
+        <div id="chart">
+            {% if chart_html %}
+                {{ chart_html | safe }}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,20 +1,35 @@
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for, jsonify, flash
 import pandas as pd
+import plotly.express as px
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
 import os
-from dash_application import create_cm_dash,create_missing_dash_application,update_cm_dash,update_dash_app
-from dash_application.statistics import create_stats_dash,update_stats_dash
+from functools import wraps
+from sklearn.preprocessing import StandardScaler, normalize
+from math import log
+from scipy.stats import boxcox
+from sklearn.preprocessing import LabelEncoder
+import plotly
+from dashApp import create_cm_dash, create_missing_dash_application, update_cm_dash, update_dash_app
+from dashApp.statistics import create_stats_dash, update_stats_dash
+# Load environment variables
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = "sessionkey1"
+app.secret_key = 'secretkey'
 
-#
+# Global variable to store the DataFrame
+df = None
+
 dash_app1 = create_missing_dash_application(app)
 dash_app2 = create_cm_dash(app)
 dash_app3 = create_stats_dash(app)
+
+
+
+# Database configuration
 db_config = {
     'host': os.getenv('MYSQL_HOST'),
     'user': os.getenv('MYSQL_USER'),
@@ -22,6 +37,7 @@ db_config = {
     'database': os.getenv('MYSQL_DB')
 }
 
+# Function to establish database connection
 def get_db_connection():
     try:
         connection = mysql.connector.connect(**db_config)
@@ -31,10 +47,21 @@ def get_db_connection():
         print(f"Error: {e}")
     return None
 
+# Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'loggedin' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Route for index (redirect to login)
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return redirect(url_for('login'))
 
+# Route for login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     msg = ''
@@ -51,15 +78,16 @@ def login():
                 session['id'] = account['id']
                 session['username'] = account['username']
                 msg = 'Logged in successfully!'
-                return render_template('landingpage.html')
+                return redirect(url_for('dataPreview'))
             else:
                 msg = 'Incorrect username / password!'
             cursor.close()
             connection.close()
         else:
             msg = 'Could not connect to the database.'
-    return render_template('index.html', msg=msg)
+    return render_template('login.html', msg=msg)
 
+# Route for registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
@@ -75,55 +103,298 @@ def register():
             connection = get_db_connection()
             if connection:
                 cursor = connection.cursor(dictionary=True)
-                cursor.execute('INSERT INTO login (username, passwrd, email) VALUES (%s, %s, %s)', (username, password, email))
+                cursor.execute('INSERT INTO login (username, passwrd, email) VALUES (%s, %s, %s)',
+                               (username, password, email))
                 connection.commit()
                 cursor.close()
                 connection.close()
                 msg = 'You have successfully registered!'
-                return render_template('index.html', msg=msg)
+                return render_template('login.html', msg=msg)
             else:
                 msg = 'Could not connect to the database.'
 
     return render_template('register.html', msg=msg)
 
-@app.route('/upload_data', methods=['GET', 'POST'])
-def upload_data():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(request.url)
-        
-        file = request.files['file']
-        if file.filename == '':
-            return redirect(request.url)
+# Route for data preview
+@app.route('/dataPreview')
+@login_required
+def dataPreview():
+    return render_template('dataPreview.html')
 
-        if file:
+# Route for uploading CSV file
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    global df  # Declare the global variable
+
+    if 'file' not in request.files:
+        return jsonify(error="No file part")
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify(error="No selected file")
+
+    if file and file.filename.endswith('.csv'):
+        try:
+            # Attempt to read the CSV file with utf-8 encoding
+            df = pd.read_csv(file.stream, encoding='utf-8')
+        except UnicodeDecodeError:
+            # If utf-8 fails, try another encoding (e.g., Latin-1)
             try:
-                df = pd.read_csv(file)
+                df = pd.read_csv(file.stream, encoding='latin-1')
             except Exception as e:
-                return f"Error reading CSV file: {e}"
+                return jsonify(error=f"Error reading CSV file: {str(e)}")
+        update_dash_app(dash_app1,df)
+        update_cm_dash(dash_app2,df)
+        update_stats_dash(dash_app3,df)
 
-            column_info = {col: str(df[col].dtype) for col in df.columns}
-            session['full_df'] = df.head(15).to_html(index=False)
-            session['uploaded_filename'] = file.filename 
+       # df = df  # Store the DataFrame in the global variable
+        table_html = df.head(50).to_html(classes='data-table', header="true", index=False)
+        return jsonify(full_table=table_html, filename=file.filename)
+
+    return jsonify(error="Invalid file type")
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    global df
+
+    if df is None:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+
+    # Flash message to inform the user about preprocessing recommendation only once
+    if 'preprocess_recommendation_shown' not in session:
+        flash('Preprocessing is recommended for better results!', 'info')
+        session['preprocess_recommendation_shown'] = True
+
+    # Set a flag to highlight preprocess in the navbar
+    highlight_preprocess = True
+
+    # Prepare column information
+    columns_info = []
+    for col in df.columns:
+        col_info = {
+            'name': col,
+            'num_rows': len(df[col]),  # Number of rows in the column
+            'dtype': str(df[col].dtype)  # Data type of the column
+        }
+        columns_info.append(col_info)
+
+    # Get initial visualization for the first numeric column
+    initial_column = None
+    initial_viz = None
+    for col in df.columns:
+        if pd.api.types.is_numeric_dtype(df[col]):
+            initial_column = col
+            # Ensure the 'size' column contains non-negative values
+            abs_col_values = df[initial_column].abs()
+            fig = px.scatter(df, x=initial_column, y=df.index, size=abs_col_values,
+                             hover_name=df.index, log_x=True, size_max=60)
+            initial_viz = fig.to_html(full_html=False, default_height=400)
+            break
+
+    return render_template('dashboard.html', columns_info=columns_info,
+                           highlight_preprocess=highlight_preprocess, initial_viz=initial_viz,
+                           initial_column=initial_column)
+
+
+@app.route('/get_visualization', methods=['POST'])
+def get_visualization():
+    global df
+    
+    column_name = request.form.get('column')
+    if not column_name:
+        return jsonify({'error': 'No column specified'})
+    
+    if column_name not in df.columns:
+        return jsonify({'error': f'Column {column_name} does not exist in the dataframe'})
+    
+    try:
+        # Ensure the 'size' column contains non-negative values
+        abs_col_values = df[column_name].abs()
+
+        # Generate bubble plot based on the selected column
+        fig = px.scatter(df, x=column_name, y=df.index, size=abs_col_values, 
+                         hover_name=df.index, log_x=True, size_max=60)
+        viz_html = fig.to_html(full_html=False, default_height=400)
+        return jsonify({'visualization': viz_html})
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+
+@app.route('/duplicates/', methods=['GET', 'POST'])
+def duplicates():
+    global df
+    
+    # Redirect if no dataset is uploaded
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))
+
+    columns = df.columns.tolist()
+    duplicates_info = {}
+    selected_columns = []
+    total_duplicates = 0
+    new_df_html = None
+
+    if request.method == 'POST':
+        selected_columns = request.form.getlist('columns')
+        action = request.form.get('action')
+
+        if selected_columns:
+            duplicate_rows = df[df.duplicated(subset=selected_columns, keep=False)]
+            total_duplicates = duplicate_rows.shape[0]
+
+            if action == 'show_duplicates':
+                duplicates_info = duplicate_rows.groupby(selected_columns).size().to_dict()
+
+            elif action == 'remove_duplicates':
+                keep_option = request.form.get('keep', 'first')
+                new_df = df.copy(deep=True)
+
+                if keep_option == 'none':
+                    new_df = new_df[~new_df.duplicated(subset=selected_columns, keep=False)]
+                else:
+                    new_df.drop_duplicates(subset=selected_columns, keep=keep_option, inplace=True)
+
+                new_df_html = new_df.head(50).to_html(classes='data-table', header="true", index=False)
+                df = new_df  # Update global DataFrame after removing duplicates
+
+    return render_template('duplicates.html', columns=columns, duplicates_info=duplicates_info,
+                           selected_columns=selected_columns, total_duplicates=total_duplicates,
+                           new_df_html=new_df_html)
+
+# Route for transformations
+@app.route('/transformations', methods=['GET', 'POST'])
+@login_required
+def transformations():
+    global df
+
+    # Work with a deep copy of the original dataframe for preprocessing
+    temp_df = df.copy(deep=True)
+
+    # Retrieve checkbox states and selected columns from session
+    log_transformation_checked = session.get('log_transformation_checked', False)
+    box_cox_transformation_checked = session.get('box_cox_transformation_checked', False)
+    standardization_checked = session.get('standardization_checked', False)
+    normalization_checked = session.get('normalization_checked', False)
+    selected_one_hot_column = session.get('selected_one_hot_column', '')
+    selected_label_column = session.get('selected_label_column', '')
+
+    # Initial table display
+    table_html = temp_df.head(50).to_html(classes='data-table', header="true", index=False)
+
+    if request.method == 'POST':
+        # Handle transformation options
+        log_transformation_checked = 'log_transformation' in request.form
+        box_cox_transformation_checked = 'box_cox_transformation' in request.form
+        standardization_checked = 'standardization' in request.form
+        normalization_checked = 'normalization' in request.form
+        selected_one_hot_column = request.form.get('one_hot_column')
+        selected_label_column = request.form.get('label_column')
+
+        # Save checkbox states to session
+        session['log_transformation_checked'] = log_transformation_checked
+        session['box_cox_transformation_checked'] = box_cox_transformation_checked
+        session['standardization_checked'] = standardization_checked
+        session['normalization_checked'] = normalization_checked
+        session['selected_one_hot_column'] = selected_one_hot_column
+        session['selected_label_column'] = selected_label_column
+
+        # Apply transformations based on selected options
+        if log_transformation_checked:
+            for col in temp_df.columns:
+                if pd.api.types.is_numeric_dtype(temp_df[col]):
+                    temp_df[col] = temp_df[col].apply(lambda x: log(x) if x > 0 else 0)
+
+        if box_cox_transformation_checked:
+            for col in temp_df.columns:
+                if pd.api.types.is_numeric_dtype(temp_df[col]) and (temp_df[col] > 0).all():
+                    try:
+                        temp_df[col], _ = boxcox(temp_df[col])
+                    except ValueError as e:
+                        print(f"Could not apply Box-Cox transformation to column {col}: {e}")
+
+        if standardization_checked:
+            scaler = StandardScaler()
+            for col in temp_df.columns:
+                if pd.api.types.is_numeric_dtype(temp_df[col]):
+                    temp_df[col] = scaler.fit_transform(temp_df[[col]])
+
+        if normalization_checked:
+            for col in temp_df.columns:
+                if pd.api.types.is_numeric_dtype(temp_df[col]):
+                    temp_df[[col]] = normalize(temp_df[[col]], axis=0)
+
+        if selected_one_hot_column:
+            temp_df = pd.get_dummies(temp_df, columns=[selected_one_hot_column])
+
+        if selected_label_column:
+            le = LabelEncoder()
+            temp_df[selected_label_column] = le.fit_transform(temp_df[selected_label_column])
+
+        # Reset to original state if no options are selected
+        if not log_transformation_checked and not box_cox_transformation_checked and not standardization_checked \
+                and not normalization_checked and not selected_one_hot_column and not selected_label_column:
+            temp_df = df.copy(deep=True)
+
+        # Update df with transformed data
+        df = temp_df
+
+        # Update table display after transformations
+        table_html = temp_df.head(50).to_html(classes='data-table', header="true", index=False)
+
+    return render_template('transformations.html', df=table_html,
+                           log_transformation_checked=log_transformation_checked,
+                           box_cox_transformation_checked=box_cox_transformation_checked,
+                           standardization_checked=standardization_checked,
+                           normalization_checked=normalization_checked,
+                           selected_one_hot_column=selected_one_hot_column,
+                           selected_label_column=selected_label_column,
+                           columns=temp_df.columns)
+
+@app.route('/charts', methods=['GET', 'POST'])
+def charts():
+    global df  # Assuming df is already loaded
+
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+
+    columns = df.columns.tolist()
+    chart_html = None
+
+    if request.method == 'POST':
+        x_axis = request.form.get('x_axis')
+        y_axis = request.form.get('y_axis')
+        chart_type = request.form.get('chart_type')
+
+        if x_axis and y_axis and chart_type:
+            if chart_type == 'line':
+                fig = px.line(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
+            elif chart_type == 'bar':
+                fig = px.bar(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
+            elif chart_type == 'scatter':
+                fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
             
-            update_dash_app(dash_app1,df)
-            update_cm_dash(dash_app2,df)
-            update_stats_dash(dash_app3,df)
+            chart_html = fig.to_html(full_html=False)
 
-            return render_template('landingpage.html', 
-                                   column_info=column_info, 
-                                   full_table=session.get('full_df'),
-                                   uploaded_filename=session.get('uploaded_filename'))
+    return render_template('charts.html', columns=columns, chart_html=chart_html)
 
-    return render_template('landingpage.html')
 
 @app.route('/correlation', methods=['GET', 'POST'])
 def correlation():
-    return redirect ('/dash1/')
+    return redirect('/correlationmatrix/')
+
 
 @app.route('/missingvalues', methods=['GET', 'POST'])
 def missingvalues():
-    return redirect ('/dash/')
+    return redirect('/missingvalue/')
 
-if __name__ == "__main__":
+
+@app.route('/describe', methods=['GET', 'POST'])
+def describe():
+    return redirect('/statistics/')
+
+
+# Run the application
+if __name__ == '__main__':
     app.run(debug=True)
+
