@@ -200,6 +200,9 @@ def dashboard():
 @app.route('/get_visualization', methods=['POST'])
 def get_visualization():
     global df
+
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
     
     column_name = request.form.get('column')
     if not column_name:
@@ -357,40 +360,61 @@ def charts():
 
     if df is None or df.empty:
         return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
-
     columns = df.columns.tolist()
-    chart_html = None
+    return render_template('charts.html', columns=columns)
 
-    if request.method == 'POST':
-        x_axis = request.form.get('x_axis')
-        y_axis = request.form.get('y_axis')
-        chart_type = request.form.get('chart_type')
 
-        if x_axis and y_axis and chart_type:
-            if chart_type == 'line':
-                fig = px.line(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
-            elif chart_type == 'bar':
-                fig = px.bar(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
-            elif chart_type == 'scatter':
-                fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
-            
-            chart_html = fig.to_html(full_html=False)
+@app.route('/generate_chart', methods=['POST'])
+def generate_chart():
+    global df
+    
+    data = request.get_json()
+    x_axis = data.get('x_axis')
+    y_axis = data.get('y_axis')
+    chart_type = data.get('chart_type')
 
-    return render_template('charts.html', columns=columns, chart_html=chart_html)
+    print(f"Received data: x_axis={x_axis}, y_axis={y_axis}, chart_type={chart_type}")
+
+    if df is None or x_axis not in df.columns or y_axis not in df.columns:
+        return jsonify({'error': 'Invalid columns selected'})
+
+    try:
+        if chart_type == 'line':
+            fig = px.line(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
+        elif chart_type == 'bar':
+            fig = px.bar(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
+        elif chart_type == 'scatter':
+            fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
+        elif chart_type == 'heatmap':
+            fig = px.imshow(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
+            fig.update_layout(title=f'{y_axis} vs {x_axis} (Heatmap)')  # Optional: Update heatmap layout
+
+        graph_json = fig.to_json()  # Convert the figure to JSON serializable format
+        return jsonify({'data': graph_json})  # Return the JSON-serializable data
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+
 
 
 @app.route('/correlation', methods=['GET', 'POST'])
 def correlation():
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
     return redirect('/correlationmatrix/')
 
 
 @app.route('/missingvalues', methods=['GET', 'POST'])
 def missingvalues():
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
     return redirect('/missingvalue/')
 
 
 @app.route('/describe', methods=['GET', 'POST'])
 def describe():
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
     return redirect('/statistics/')
 
 
