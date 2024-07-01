@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .animated-underline .dropbtn-text::after {
+            animation: underlineAnimation 1s ease-in-out 3;
+        }
+
+        @keyframes underlineAnimation {
+            0%, 100% {
+                transform: scaleX(0);
+            }
+            50% {
+                transform: scaleX(1);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -32,7 +46,7 @@
                     <a href="/charts">Charts</a>
                 </div>
             </div>
-            <div class="dropdown">
+            <div class="dropdown" id="preprocessing-dropdown">
                 <span class="dropbtn-text">Pre-Processing</span>
                 <div class="dropdown-content">
                     <a href="/transformations">Feature Engineering</a>
@@ -42,7 +56,7 @@
             <div class="dropdown">
                 <span class="dropbtn-text">Regression</span>
                 <div class="dropdown-content">
-                    <a href="#">Linear Regression</a>
+                    <a href="/linearRegression">Linear Regression</a>
                     <a href="#">Model Accuracy</a>
                 </div>
             </div>
@@ -104,6 +118,29 @@
 
     <script>
         $(document).ready(function () {
+            // Check if preprocessing notification has been shown
+            var preprocessingNotificationShown = sessionStorage.getItem('preprocessingNotificationShown');
+
+            if (!preprocessingNotificationShown) {
+                console.log('Preprocessing notification not shown before. Showing now.');
+                // Show the notification
+                var flashMessage = '<div class="flash-message info">Preprocessing is recommended <button class="close-btn">&times;</button></div>';
+                $('.container').prepend(flashMessage);
+
+                // Set sessionStorage to indicate notification has been shown
+                sessionStorage.setItem('preprocessingNotificationShown', true);
+            } else {
+                console.log('Preprocessing notification has already been shown.');
+            }
+
+            // Handle close button click for flash messages
+            $(document).on('click', '.flash-message .close-btn', function() {
+                $(this).parent().fadeOut(function() {
+                    // Trigger underline animation
+                    $('#preprocessing-dropdown').addClass('animated-underline');
+                });
+            });
+
             // Function to update visualization
             function updateVisualization(selectedColumn) {
                 $.ajax({
@@ -141,7 +178,6 @@
             var initialColumn = "{{ initial_column }}";
             updateVisualization(initialColumn);
         });
-
     </script>
 
 </body>

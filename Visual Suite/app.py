@@ -13,6 +13,10 @@ from sklearn.preprocessing import LabelEncoder
 import plotly
 from dashApp import create_cm_dash, create_missing_dash_application, update_cm_dash, update_dash_app
 from dashApp.statistics import create_stats_dash, update_stats_dash
+from sklearn.linear_model import LinearRegression
+import json
+
+
 # Load environment variables
 load_dotenv()
 
@@ -417,6 +421,47 @@ def describe():
         return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
     return redirect('/statistics/')
 
+@app.route('/linearRegression', methods=['GET'])
+@login_required
+def linear_regression():
+    global df
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+    columns = df.columns.tolist()
+    return render_template('linearRegression.html', columns=columns)
+
+# Route to perform the linear regression
+@app.route('/run_regression', methods=['POST'])
+def run_regression():
+    global df
+    if df is None or df.empty:
+        return jsonify({'error': 'No dataset available'})
+
+    dependent_var = request.form.get('dependent_variable')
+    independent_var = request.form.get('independent_variable')
+
+    if dependent_var not in df.columns or independent_var not in df.columns:
+        return jsonify({'error': 'Invalid columns selected'})
+
+    X = df[[independent_var]].values
+    y = df[dependent_var].values
+
+    model = LinearRegression()
+    model.fit(X, y)
+    intercept = model.intercept_
+    coefficient = model.coef_[0]
+
+    # Create a scatter plot with the regression line
+    fig = px.scatter(df, x=independent_var, y=dependent_var, title=f'{dependent_var} vs {independent_var}')
+    fig.add_traces(px.line(df, x=independent_var, y=model.predict(X), labels={independent_var: 'x', dependent_var: 'y'}).data)
+
+    plot_data = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return jsonify({
+        'intercept': intercept,
+        'coefficient': coefficient,
+        'plot_data': plot_data
+    })
 
 # Run the application
 if __name__ == '__main__':
