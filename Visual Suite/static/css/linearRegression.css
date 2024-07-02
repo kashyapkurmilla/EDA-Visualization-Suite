@@ -1,4 +1,3 @@
-/* static/css/linear_regression.css */
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
@@ -6,18 +5,117 @@ body {
     padding: 0;
 }
 
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333333;
+    padding: 15px 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav img {
+    max-width: 50px;
+    height: auto;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropbtn-text {
+    margin-right: 5px;
+    margin-left: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.dropbtn-text::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #FFB400;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+    z-index: 1;
+}
+
+.dropbtn-text:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #262626;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    border-radius: 8px;
+    top: 100%;
+    margin-top: 5px;
+}
+
+.dropdown-content a {
+    color: #ffffff;
+    padding: 8px 10px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #3d3d3d;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
 .container {
     max-width: 800px;
-    margin: 50px auto;
+    margin: 100px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h2 {
+h1, h2 {
     text-align: center;
     margin-bottom: 20px;
+    color: #FFB400;
+}
+
+.form-container {
+    margin-bottom: 50px;
 }
 
 form {
@@ -27,33 +125,39 @@ form {
 
 label {
     margin-bottom: 8px;
+    color: #333;
 }
 
-select, button {
+select, button, input[type="text"] {
     margin-bottom: 16px;
     padding: 8px;
     font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 button {
-    background-color: #007bff;
+    background-color: #FFB400;
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #e6a700;
 }
 
-#regression-results {
-    margin-top: 30px;
-}
-
-#regression-results h3 {
-    margin-bottom: 10px;
+#regression-result, #prediction-result {
+    margin-top: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
 }
 
 #regression-plot {
+    width: 100%;
+    height: 600px;
     margin-top: 20px;
 }

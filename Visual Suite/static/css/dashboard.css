@@ -122,7 +122,7 @@
 }
 
 .table-wrapper {
-    max-height: 400px;
+    max-height: 800px;
     overflow-y: auto;
 }
 
@@ -165,9 +165,6 @@ body {
     margin: 10px 20px; /* Adjusted margin for visualization */
 }
 
-.visualization {
-    min-height: 600px; /* Adjusted minimum height for visualization */
-}
 
 #column-name {
     text-align: center;
@@ -251,18 +248,21 @@ body {
     transform-origin: bottom right;
     animation: underline-animation 0.5s ease-out 0s 3;
 }
+.animated-underline .dropbtn-text::after {
+    animation: underlineAnimation 1s ease-in-out 3;
+}
 
-@keyframes underline-animation {
-    0% {
+@keyframes underlineAnimation {
+    0%, 100% {
         transform: scaleX(0);
-        transform-origin: bottom right;
     }
     50% {
         transform: scaleX(1);
-        transform-origin: bottom left;
     }
-    100% {
-        transform: scaleX(0);
-        transform-origin: bottom right;
-    }
+}
+
+#plot {
+    width: 100%;
+    height: 600px; /* Adjust the height as needed */
+    margin-top: 20px;
 }

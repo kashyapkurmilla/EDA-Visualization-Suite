@@ -430,7 +430,6 @@ def linear_regression():
     columns = df.columns.tolist()
     return render_template('linearRegression.html', columns=columns)
 
-# Route to perform the linear regression
 @app.route('/run_regression', methods=['POST'])
 def run_regression():
     global df
@@ -462,6 +461,33 @@ def run_regression():
         'coefficient': coefficient,
         'plot_data': plot_data
     })
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    global df
+
+    data = request.form.to_dict()
+    dependent_variable = data['dependent_variable']
+    independent_variable = data['independent_variable']
+    input_value = float(data['input_value'])  # Assuming input is numeric
+
+    if df is None or dependent_variable not in df.columns or independent_variable not in df.columns:
+        return jsonify(error="Invalid columns selected")
+
+    try:
+        X = df[[independent_variable]].values
+        y = df[dependent_variable].values
+
+        model = LinearRegression()
+        model.fit(X, y)
+
+        predicted_value = model.predict([[input_value]])[0]
+
+        return jsonify(predicted_value=predicted_value)
+
+    except Exception as e:
+        return jsonify(error=str(e))
+
 
 # Run the application
 if __name__ == '__main__':

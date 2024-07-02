@@ -1,50 +1,100 @@
-<!-- templates/linear_regression.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Linear Regression</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/linearRegression.css') }}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
+    <div class="navbar">
+        <div class="nav">
+            <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Logo">
+            <div class="nav-links">
+                <a href="#" class="dropbtn-text">Home</a>
+                <a href="#" class="dropbtn-text">Data Upload</a>
+                <div class="dropdown">
+                    <span class="dropbtn-text">Analysis</span>
+                    <div class="dropdown-content">
+                        <a href="#">Descriptive Stats</a>
+                        <a href="#">Linear Regression</a>
+                        <a href="#">Other Analysis</a>
+                    </div>
+                </div>
+                <a href="#" class="dropbtn-text">Contact</a>
+            </div>
+        </div>
+    </div>
     <div class="container">
-        <h2>Linear Regression</h2>
-        <form id="linear-regression-form">
-            <label for="dependent-variable">Dependent Variable (Y):</label>
-            <select id="dependent-variable" name="dependent_variable">
-                {% for column in columns %}
-                    <option value="{{ column }}">{{ column }}</option>
-                {% endfor %}
-            </select>
-            <label for="independent-variable">Independent Variable (X):</label>
-            <select id="independent-variable" name="independent_variable">
-                {% for column in columns %}
-                    <option value="{{ column }}">{{ column }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Run Regression</button>
-        </form>
-        <div id="regression-results"></div>
+        <div class="form-container">
+            <h1>Run Linear Regression</h1>
+            <form id="regression-form">
+                <label for="dependent_variable">Dependent Variable:</label>
+                <select id="dependent_variable" name="dependent_variable">
+                    {% for column in columns %}
+                        <option value="{{ column }}">{{ column }}</option>
+                    {% endfor %}
+                </select>
+                <label for="independent_variable">Independent Variable:</label>
+                <select id="independent_variable" name="independent_variable">
+                    {% for column in columns %}
+                        <option value="{{ column }}">{{ column }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Run Regression</button>
+            </form>
+            <div id="regression-result" style="margin-top: 20px;"></div>
+            <div id="regression-plot" style="margin-top: 20px;"></div>
+        </div>
+        <div class="form-container">
+            <h2>Predict Dependent Variable</h2>
+            <form id="prediction-form">
+                <label for="input_value">Enter Independent Variable Value:</label>
+                <input type="text" id="input_value" name="input_value">
+                <input type="hidden" id="prediction_dependent_variable" name="dependent_variable">
+                <input type="hidden" id="prediction_independent_variable" name="independent_variable">
+                <button type="submit">Predict</button>
+            </form>
+            <div id="prediction-result" style="margin-top: 20px;"></div>
+        </div>
     </div>
     <script>
-        $(document).ready(function() {
-            $('#linear-regression-form').submit(function(event) {
-                event.preventDefault();
-                var formData = $(this).serialize();
-                $.post('/run_regression', formData, function(data) {
-                    if (data.error) {
-                        $('#regression-results').html('<p>' + data.error + '</p>');
-                    } else {
-                        $('#regression-results').html('<h3>Regression Results</h3><p>Intercept: ' + data.intercept + '</p><p>Coefficient: ' + data.coefficient + '</p><div id="regression-plot"></div>');
-                        var plotData = JSON.parse(data.plot_data);
-                        Plotly.newPlot('regression-plot', plotData.data, plotData.layout);
-                    }
-                });
+        document.getElementById('regression-form').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetch('/run_regression', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('regression-result').innerText = data.error;
+                } else {
+                    document.getElementById('regression-result').innerText = `Intercept: ${data.intercept}, Coefficient: ${data.coefficient}`;
+                    Plotly.newPlot('regression-plot', JSON.parse(data.plot_data));
+                    document.getElementById('prediction_dependent_variable').value = document.getElementById('dependent_variable').value;
+                    document.getElementById('prediction_independent_variable').value = document.getElementById('independent_variable').value;
+                }
             });
-        });
+        };
+
+        document.getElementById('prediction-form').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('prediction-result').innerText = data.error;
+                } else {
+                    document.getElementById('prediction-result').innerText = `Predicted Value: ${data.predicted_value}`;
+                }
+            });
+        };
     </script>
 </body>
 </html>
