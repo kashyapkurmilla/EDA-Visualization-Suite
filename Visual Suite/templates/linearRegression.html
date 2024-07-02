@@ -5,6 +5,8 @@
     <title>Linear Regression</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/linearRegression.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/css/multi-select-tag.css">
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/js/multi-select-tag.js"></script>
 </head>
 <body>
     <div class="navbar">
@@ -35,22 +37,26 @@
                         <option value="{{ column }}">{{ column }}</option>
                     {% endfor %}
                 </select>
-                <label for="independent_variable">Independent Variable:</label>
-                <select id="independent_variable" name="independent_variable">
+                <label for="independent_variable">Choose columns:</label>
+                <select id="independent_variable" name="independent_variable" multiple>
                     {% for column in columns %}
                         <option value="{{ column }}">{{ column }}</option>
                     {% endfor %}
                 </select>
                 <button type="submit">Run Regression</button>
             </form>
+            <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/js/multi-select-tag.js"></script>
+            <script>
+                new MultiSelectTag('independent_variable'); // Initialize the multi-select tag
+            </script>
             <div id="regression-result" style="margin-top: 20px;"></div>
             <div id="regression-plot" style="margin-top: 20px;"></div>
         </div>
         <div class="form-container">
             <h2>Predict Dependent Variable</h2>
             <form id="prediction-form">
-                <label for="input_value">Enter Independent Variable Value:</label>
-                <input type="text" id="input_value" name="input_value">
+                <label for="input_values">Enter Independent Variable Values (comma-separated):</label>
+                <input type="text" id="input_values" name="input_values">
                 <input type="hidden" id="prediction_dependent_variable" name="dependent_variable">
                 <input type="hidden" id="prediction_independent_variable" name="independent_variable">
                 <button type="submit">Predict</button>
@@ -71,10 +77,10 @@
                 if (data.error) {
                     document.getElementById('regression-result').innerText = data.error;
                 } else {
-                    document.getElementById('regression-result').innerText = `Intercept: ${data.intercept}, Coefficient: ${data.coefficient}`;
+                    document.getElementById('regression-result').innerText = `Intercept: ${data.intercept}, Coefficients: ${JSON.stringify(data.coefficients)}`;
                     Plotly.newPlot('regression-plot', JSON.parse(data.plot_data));
                     document.getElementById('prediction_dependent_variable').value = document.getElementById('dependent_variable').value;
-                    document.getElementById('prediction_independent_variable').value = document.getElementById('independent_variable').value;
+                    document.getElementById('prediction_independent_variable').value = Array.from(document.getElementById('independent_variable').selectedOptions).map(option => option.value).join(',');
                 }
             });
         };

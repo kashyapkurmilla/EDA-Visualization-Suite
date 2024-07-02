@@ -121,7 +121,7 @@ def register():
 
 # Route for data preview
 @app.route('/dataPreview')
-@login_required
+#@login_required
 def dataPreview():
     return render_template('dataPreview.html')
 
@@ -158,7 +158,7 @@ def upload_file():
     return jsonify(error="Invalid file type")
 
 @app.route('/dashboard')
-@login_required
+#@login_required
 def dashboard():
     global df
 
@@ -271,7 +271,7 @@ def duplicates():
 
 # Route for transformations
 @app.route('/transformations', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def transformations():
     global df
 
@@ -360,10 +360,10 @@ def transformations():
 
 @app.route('/charts', methods=['GET', 'POST'])
 def charts():
-    global df  # Assuming df is already loaded
+    global df  
 
     if df is None or df.empty:
-        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+        return redirect(url_for('dataPreview'))  
     columns = df.columns.tolist()
     return render_template('charts.html', columns=columns)
 
@@ -422,11 +422,11 @@ def describe():
     return redirect('/statistics/')
 
 @app.route('/linearRegression', methods=['GET'])
-@login_required
+#@login_required
 def linear_regression():
     global df
     if df is None or df.empty:
-        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+        return redirect(url_for('dataPreview')) 
     columns = df.columns.tolist()
     return render_template('linearRegression.html', columns=columns)
 
@@ -437,30 +437,40 @@ def run_regression():
         return jsonify({'error': 'No dataset available'})
 
     dependent_var = request.form.get('dependent_variable')
-    independent_var = request.form.get('independent_variable')
+    independent_vars = request.form.getlist('independent_variable')
 
-    if dependent_var not in df.columns or independent_var not in df.columns:
+    if dependent_var not in df.columns or not all(var in df.columns for var in independent_vars):
         return jsonify({'error': 'Invalid columns selected'})
 
-    X = df[[independent_var]].values
+    
+    non_numeric_columns = [var for var in independent_vars if not pd.api.types.is_numeric_dtype(df[var])]
+    if not pd.api.types.is_numeric_dtype(df[dependent_var]):
+        non_numeric_columns.append(dependent_var)
+
+    if non_numeric_columns:
+        return jsonify({'error': f'Non-numeric columns selected: {", ".join(non_numeric_columns)}'})
+
+    X = df[independent_vars].values
     y = df[dependent_var].values
 
     model = LinearRegression()
     model.fit(X, y)
     intercept = model.intercept_
-    coefficient = model.coef_[0]
+    coefficients = dict(zip(independent_vars, model.coef_))
 
-    # Create a scatter plot with the regression line
-    fig = px.scatter(df, x=independent_var, y=dependent_var, title=f'{dependent_var} vs {independent_var}')
-    fig.add_traces(px.line(df, x=independent_var, y=model.predict(X), labels={independent_var: 'x', dependent_var: 'y'}).data)
-
-    plot_data = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    if len(independent_vars) == 1:
+        fig = px.scatter(df, x=independent_vars[0], y=dependent_var, title=f'{dependent_var} vs {independent_vars[0]}')
+        fig.add_trace(px.line(df, x=independent_vars[0], y=model.predict(X), labels={independent_vars[0]: 'x', dependent_var: 'y'}).data[0])
+        plot_data = fig.to_json()
+    else:
+        plot_data = json.dumps({'message': 'Plotting not available for multiple independent variables'})
 
     return jsonify({
         'intercept': intercept,
-        'coefficient': coefficient,
+        'coefficients': coefficients,
         'plot_data': plot_data
     })
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -468,20 +478,20 @@ def predict():
 
     data = request.form.to_dict()
     dependent_variable = data['dependent_variable']
-    independent_variable = data['independent_variable']
-    input_value = float(data['input_value'])  # Assuming input is numeric
+    independent_variables = data['independent_variable'].split(',')
+    input_values = list(map(float, data['input_values'].split(',')))
 
-    if df is None or dependent_variable not in df.columns or independent_variable not in df.columns:
+    if df is None or dependent_variable not in df.columns or not all(var in df.columns for var in independent_variables):
         return jsonify(error="Invalid columns selected")
 
     try:
-        X = df[[independent_variable]].values
+        X = df[independent_variables].values
         y = df[dependent_variable].values
 
         model = LinearRegression()
         model.fit(X, y)
 
-        predicted_value = model.predict([[input_value]])[0]
+        predicted_value = model.predict([input_values])[0]
 
         return jsonify(predicted_value=predicted_value)
 
