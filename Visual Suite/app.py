@@ -157,6 +157,7 @@ def upload_file():
 
     return jsonify(error="Invalid file type")
 
+
 @app.route('/dashboard')
 #@login_required
 def dashboard():
@@ -193,13 +194,13 @@ def dashboard():
             abs_col_values = df[initial_column].abs()
             fig = px.scatter(df, x=initial_column, y=df.index, size=abs_col_values,
                              hover_name=df.index, log_x=True, size_max=60)
+            fig.update_layout(height=600)  # Set initial height
             initial_viz = fig.to_html(full_html=False, default_height=400)
             break
 
     return render_template('dashboard.html', columns_info=columns_info,
                            highlight_preprocess=highlight_preprocess, initial_viz=initial_viz,
                            initial_column=initial_column)
-
 
 @app.route('/get_visualization', methods=['POST'])
 def get_visualization():
@@ -222,6 +223,7 @@ def get_visualization():
         # Generate bubble plot based on the selected column
         fig = px.scatter(df, x=column_name, y=df.index, size=abs_col_values, 
                          hover_name=df.index, log_x=True, size_max=60)
+        fig.update_layout(height=600)
         viz_html = fig.to_html(full_html=False, default_height=400)
         return jsonify({'visualization': viz_html})
     except Exception as e:
@@ -421,14 +423,14 @@ def describe():
         return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
     return redirect('/statistics/')
 
-@app.route('/linearRegression', methods=['GET'])
+@app.route('/regression', methods=['GET'])
 #@login_required
 def linear_regression():
     global df
     if df is None or df.empty:
         return redirect(url_for('dataPreview')) 
-    columns = df.columns.tolist()
-    return render_template('linearRegression.html', columns=columns)
+    columns = df.select_dtypes(include='number').columns.tolist()
+    return render_template('regression.html', columns=columns)
 
 @app.route('/run_regression', methods=['POST'])
 def run_regression():
@@ -442,7 +444,6 @@ def run_regression():
     if dependent_var not in df.columns or not all(var in df.columns for var in independent_vars):
         return jsonify({'error': 'Invalid columns selected'})
 
-    
     non_numeric_columns = [var for var in independent_vars if not pd.api.types.is_numeric_dtype(df[var])]
     if not pd.api.types.is_numeric_dtype(df[dependent_var]):
         non_numeric_columns.append(dependent_var)
@@ -465,11 +466,23 @@ def run_regression():
     else:
         plot_data = json.dumps({'message': 'Plotting not available for multiple independent variables'})
 
+    # Generate pair plot
+    pair_fig = px.scatter_matrix(df, dimensions=independent_vars + [dependent_var], title="Pair Plot")
+    pair_plot_data = pair_fig.to_json()
+
+    # Generate correlation heatmap
+    corr_matrix = df[independent_vars + [dependent_var]].corr()
+    heatmap_fig = px.imshow(corr_matrix, text_auto=True, title="Correlation Heatmap")
+    correlation_heatmap = heatmap_fig.to_json()
+
     return jsonify({
         'intercept': intercept,
         'coefficients': coefficients,
-        'plot_data': plot_data
+        'plot_data': plot_data,
+        'pair_plot_data': pair_plot_data,
+        'correlation_heatmap': correlation_heatmap
     })
+
 
 
 @app.route('/predict', methods=['POST'])

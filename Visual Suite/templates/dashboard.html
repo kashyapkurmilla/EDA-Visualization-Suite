@@ -14,9 +14,12 @@
         }
 
         @keyframes underlineAnimation {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scaleX(0);
             }
+
             50% {
                 transform: scaleX(1);
             }
@@ -56,7 +59,7 @@
             <div class="dropdown">
                 <span class="dropbtn-text">Regression</span>
                 <div class="dropdown-content">
-                    <a href="/linearRegression">Linear Regression</a>
+                    <a href="/regression">Linear Regression</a>
                     <a href="#">Model Accuracy</a>
                 </div>
             </div>
@@ -104,12 +107,13 @@
             <!-- Visualization Section -->
             <div class="visualizations">
                 <h2>Visualization</h2>
-                <div id="column-name" style="text-align: left; font-size: 20px; font-weight: bold; margin-bottom: 10px;"></div>
+                <div id="column-name"
+                    style="text-align: left; font-size: 20px; font-weight: bold; margin-bottom: 10px;"></div>
                 <div id="column-viz" style="width: 100%; height: 600px;">
                     {% if initial_viz %}
-                        {{ initial_viz | safe }}
+                    {{ initial_viz | safe }}
                     {% else %}
-                        <p>No numeric columns available for visualization.</p>
+                    <p>No numeric columns available for visualization.</p>
                     {% endif %}
                 </div>
             </div>
@@ -134,8 +138,8 @@
             }
 
             // Handle close button click for flash messages
-            $(document).on('click', '.flash-message .close-btn', function() {
-                $(this).parent().fadeOut(function() {
+            $(document).on('click', '.flash-message .close-btn', function () {
+                $(this).parent().fadeOut(function () {
                     // Trigger underline animation
                     $('#preprocessing-dropdown').addClass('animated-underline');
                 });
@@ -154,7 +158,7 @@
                         var graphDiv = document.getElementById('column-viz').getElementsByTagName('div')[0];
                         Plotly.relayout(graphDiv, {
                             width: $('#column-viz').width(),
-                            height: $('#column-viz').height()
+                            height: 600  // Set the height here
                         });
                     },
                     error: function (err) {
