@@ -110,8 +110,13 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.form-container, .visualization-container {
+.form-container {
     flex: 1;
+    margin: 10px;
+}
+
+.visualization-container {
+    flex: 2;
     margin: 10px;
 }
 
