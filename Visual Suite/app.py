@@ -519,31 +519,24 @@ def comparativeanalysis():
 
         if target_column and target_column in setup_df.columns:
             try:
+                print("Setting up PyCaret for regression")
+                from pycaret.regression import setup, compare_models, pull, save_model
                 
-                print("Setting up PyCaret")
                 setup(data=setup_df, target=target_column, verbose=False)
-                
                 
                 print("Comparing models")
                 best_model = compare_models()
-                results_df = pull()  
-                
+                results_df = pull()
                 
                 print("Saving the best model")
                 save_model(best_model, 'best_model')
 
-                
                 results_html = results_df.to_html(classes='data-table', header="true", index=False)
                 session['results_html'] = results_html
 
-                
-                #lr = create_model('lr')
-                #evaluate_model_html = evaluate_model(lr)  # Modify display format as needed
-
                 print("Results HTML:")
-                #print(results_html)
-
                 return render_template('companalysis.html', target_column=target_column,
+                                       columns=setup_df.columns.tolist(),
                                        results_html=results_html, evaluate_model_html=evaluate_model_html)
 
             except Exception as e:
@@ -554,10 +547,9 @@ def comparativeanalysis():
     print("Columns available for selection:")
     print(columns)
 
-    
     results_html = session.get('results_html', None)
 
-    return render_template('companalysis.html', columns=columns, results_html=results_html, evaluate_model_html=evaluate_model_html)
+    return render_template('companalysis.html', columns=columns, results_html=results_html)
 
 # Run the application
 if __name__ == '__main__':

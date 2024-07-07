@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Comparative Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/analysis.css') }}">
 </head>
 <body>
     <div class="navbar">
@@ -59,12 +59,12 @@
     </div>
     <div class="container">
         <h1>Comparative Analysis</h1>
-        <form method="POST">
+        <form id="analysis-form" method="POST">
             <div class="form-group">
                 <label for="target_column">Select Target Column:</label>
                 <select id="target_column" name="target_column" class="" required>
                     {% for column in columns %}
-                    <option value="{{ column }}">{{ column }}</option>
+                    <option value="{{ column }}" {% if column == target_column %}selected{% endif %}>{{ column }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -72,11 +72,9 @@
         </form>
 
         {% if target_column %}
-        <h2>Comparison Results for Target Column: {{ target_column }}</h2>
         <div class="table-responsive">
             {{ results_html|safe }}
         </div>
-
         {% endif %}
     </div>
 </body>
