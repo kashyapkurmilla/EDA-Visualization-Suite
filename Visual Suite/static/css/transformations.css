@@ -8,8 +8,8 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #121212;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #121212;
   font-size: 14px;
 }
 
@@ -18,13 +18,17 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #333333;
+  background-color: #000000;
   padding: 8px 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.navbar a {
+  color: #ffffff;
 }
 
 .nav {
@@ -42,7 +46,6 @@ body {
 .dropdown {
   position: relative;
 }
-
 .dropbtn-text {
   margin-right: 5px;
   margin-left: 5px;
@@ -54,6 +57,7 @@ body {
   position: relative;
   padding-bottom: 5px;
 }
+
 
 .dropbtn-text::after {
   content: '';
@@ -77,9 +81,9 @@ body {
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #262626;
-  min-width: 140px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  background-color: #000000;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
   z-index: 2;
   border-radius: 8px;
   top: 100%;
@@ -88,14 +92,14 @@ body {
 
 .dropdown-content a {
   color: #ffffff;
-  padding: 8px 10px;
+  padding: 10px 15px;
   text-decoration: none;
   display: block;
   transition: background-color 0.2s ease;
 }
 
 .dropdown-content a:hover {
-  background-color: #3d3d3d;
+  background-color: #2a2a2a;
 }
 
 .dropdown:hover .dropdown-content {
@@ -107,11 +111,11 @@ body {
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
-  padding-top: 100px;
+  padding-top: 80px;
 }
 
 .checkbox-container {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .checkbox-container input[type="checkbox"] {
@@ -122,7 +126,7 @@ body {
   position: relative;
   padding-left: 25px;
   cursor: pointer;
-  color: #ffffff;
+  color: #121212;
   font-size: 14px;
 }
 
@@ -141,41 +145,36 @@ body {
   background-color: #FFB400;
 }
 
-.checkbox-container label:after {
-  content: '';
-  position: absolute;
-  display: none;
-}
-
 .select-container {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .select-container label {
   display: block;
-  color: #ffffff;
+  color: #121212;
   margin-bottom: 5px;
 }
 
 .select-container select {
   width: 100%;
   padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ffffff;
+  font-size: 14px;
+  border: 1px solid #121212;
   border-radius: 4px;
-  background-color: #262626;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #121212;
 }
 
 .apply-button {
   margin-top: 10px;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 14px;
   background-color: #FFB400;
   color: #121212;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .apply-button:hover {
@@ -186,41 +185,42 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background-color: #262626; /* Dark grey background */
+  background-color: #ffffff; /* White background */
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
 }
 
 .data-table th, .data-table td {
-  border: 1px solid #333333; /* Darker border color */
-  padding: 12px; /* Increased padding for better spacing */
+  border: 1px solid #dddddd; /* Light grey border color */
+  padding: 10px; /* Adjusted padding for compact spacing */
   text-align: left;
-  color: #ffffff; /* White text color */
+  color: #121212; /* Dark text color */
 }
 
 .data-table th {
-  background-color: #121212; /* Darker grey background for header */
+  background-color: #f8f8f8; /* Light grey background for header */
 }
 
 .data-table td {
-  background-color: #333333; /* Dark grey background for cells */
+  background-color: #ffffff; /* White background for cells */
 }
 
 .data-table tbody tr:nth-child(even) td {
-  background-color: #1c1c1c; /* Slightly lighter grey for even rows */
+  background-color: #f2f2f2; /* Slightly lighter grey for even rows */
 }
 
 @media (max-width: 480px) {
   .navbar {
-      padding: 12px;
+    padding: 12px;
   }
 
   .container {
-      padding: 10px;
+    padding: 10px;
   }
 
   .apply-button {
-      font-size: 14px;
+    font-size: 14px;
   }
+
 }

@@ -277,6 +277,9 @@ def duplicates():
 def transformations():
     global df
 
+    if df is None or df.empty:
+        return redirect(url_for('dataPreview'))
+
     # Work with a deep copy of the original dataframe for preprocessing
     temp_df = df.copy(deep=True)
 
