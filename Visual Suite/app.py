@@ -15,6 +15,8 @@ from dashApp import create_cm_dash, create_missing_dash_application, update_cm_d
 from dashApp.statistics import create_stats_dash, update_stats_dash
 from sklearn.linear_model import LinearRegression
 import json
+from pycaret.classification import setup, compare_models, evaluate_model, pull, load_model, save_model,create_model
+
 
 
 # Load environment variables
@@ -513,7 +515,57 @@ def predict():
 
     except Exception as e:
         return jsonify(error=str(e))
+    
+@app.route('/comparativeanalysis', methods=['GET', 'POST'])
+def comparativeanalysis():
+    global df
 
+    if df is None or df.empty:
+        print("Redirecting to dataPreview: df is None or empty")
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+
+    setup_df = df.copy()
+    target_column = None
+    evaluate_model_html = None  # To store the evaluate_model output
+
+    if request.method == 'POST':
+        target_column = request.form.get('target_column')
+
+        print(f"Selected target column: {target_column}")
+
+        if target_column and target_column in setup_df.columns:
+            try:
+                print("Setting up PyCaret for regression")
+                from pycaret.regression import setup, compare_models, pull, save_model
+                
+                setup(data=setup_df, target=target_column, verbose=False)
+                
+                print("Comparing models")
+                best_model = compare_models()
+                results_df = pull()
+                
+                print("Saving the best model")
+                save_model(best_model, 'best_model')
+
+                results_html = results_df.to_html(classes='data-table', header="true", index=False)
+                session['results_html'] = results_html
+
+                print("Results HTML:")
+                return render_template('companalysis.html', target_column=target_column,
+                                       columns=setup_df.columns.tolist(),
+                                       results_html=results_html, evaluate_model_html=evaluate_model_html)
+
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                flash(f"An error occurred: {e}", 'danger')
+
+    columns = df.columns.tolist()
+    print("Columns available for selection:")
+    print(columns)
+
+    results_html = session.get('results_html', None)
+
+    return render_template('companalysis.html', columns=columns, results_html=results_html)
 
 # Run the application
 if __name__ == '__main__':
