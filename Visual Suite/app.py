@@ -16,6 +16,9 @@ from dashApp.statistics import create_stats_dash, update_stats_dash
 from sklearn.linear_model import LinearRegression
 import json
 from pycaret.classification import setup, compare_models, evaluate_model, pull, load_model, save_model,create_model
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
+import lightgbm as lgb
 
 
 
@@ -437,6 +440,57 @@ def linear_regression():
     columns = df.select_dtypes(include='number').columns.tolist()
     return render_template('regression.html', columns=columns)
 
+# @app.route('/run_regression', methods=['POST'])
+# def run_regression():
+#     global df
+#     if df is None or df.empty:
+#         return jsonify({'error': 'No dataset available'})
+
+#     dependent_var = request.form.get('dependent_variable')
+#     independent_vars = request.form.getlist('independent_variable')
+
+#     if dependent_var not in df.columns or not all(var in df.columns for var in independent_vars):
+#         return jsonify({'error': 'Invalid columns selected'})
+
+#     non_numeric_columns = [var for var in independent_vars if not pd.api.types.is_numeric_dtype(df[var])]
+#     if not pd.api.types.is_numeric_dtype(df[dependent_var]):
+#         non_numeric_columns.append(dependent_var)
+
+#     if non_numeric_columns:
+#         return jsonify({'error': f'Non-numeric columns selected: {", ".join(non_numeric_columns)}'})
+
+#     X = df[independent_vars].values
+#     y = df[dependent_var].values
+
+#     model = LinearRegression()
+#     model.fit(X, y)
+#     intercept = model.intercept_
+#     coefficients = dict(zip(independent_vars, model.coef_))
+
+#     if len(independent_vars) == 1:
+#         fig = px.scatter(df, x=independent_vars[0], y=dependent_var, title=f'{dependent_var} vs {independent_vars[0]}')
+#         fig.add_trace(px.line(df, x=independent_vars[0], y=model.predict(X), labels={independent_vars[0]: 'x', dependent_var: 'y'}).data[0])
+#         plot_data = fig.to_json()
+#     else:
+#         plot_data = json.dumps({'message': 'Plotting not available for multiple independent variables'})
+
+#     # Generate pair plot
+#     pair_fig = px.scatter_matrix(df, dimensions=independent_vars + [dependent_var], title="Pair Plot")
+#     pair_plot_data = pair_fig.to_json()
+
+#     # Generate correlation heatmap
+#     corr_matrix = df[independent_vars + [dependent_var]].corr()
+#     heatmap_fig = px.imshow(corr_matrix, text_auto=True, title="Correlation Heatmap")
+#     correlation_heatmap = heatmap_fig.to_json()
+
+#     return jsonify({
+#         'intercept': intercept,
+#         'coefficients': coefficients,
+#         'plot_data': plot_data,
+#         'pair_plot_data': pair_plot_data,
+#         'correlation_heatmap': correlation_heatmap
+#     })
+
 @app.route('/run_regression', methods=['POST'])
 def run_regression():
     global df
@@ -445,6 +499,7 @@ def run_regression():
 
     dependent_var = request.form.get('dependent_variable')
     independent_vars = request.form.getlist('independent_variable')
+    regression_model = request.form.get('regression_model')
 
     if dependent_var not in df.columns or not all(var in df.columns for var in independent_vars):
         return jsonify({'error': 'Invalid columns selected'})
@@ -459,7 +514,23 @@ def run_regression():
     X = df[independent_vars].values
     y = df[dependent_var].values
 
-    model = LinearRegression()
+    if regression_model == 'linear_regression':
+        model = LinearRegression()
+    elif regression_model == 'decision_tree':
+        model = DecisionTreeRegressor()
+    elif regression_model == 'random_forest':
+        model = RandomForestRegressor()
+    elif regression_model == 'adaboost':
+        model = AdaBoostRegressor()
+    elif regression_model == 'bagging':
+        model = BaggingRegressor()
+    elif regression_model == 'gradient_boosting':
+        model = GradientBoostingRegressor()
+    elif regression_model == 'lightgbm':
+        model = lgb.LGBMRegressor()
+    else:
+        return jsonify({'error': 'Invalid regression model selected'})
+
     model.fit(X, y)
     intercept = model.intercept_
     coefficients = dict(zip(independent_vars, model.coef_))
@@ -487,7 +558,6 @@ def run_regression():
         'pair_plot_data': pair_plot_data,
         'correlation_heatmap': correlation_heatmap
     })
-
 
 
 @app.route('/predict', methods=['POST'])
@@ -567,7 +637,7 @@ def comparativeanalysis():
 
     return render_template('companalysis.html', columns=columns, results_html=results_html)
 
-# Run the application
+# Run application
 if __name__ == '__main__':
     app.run(debug=True)
 

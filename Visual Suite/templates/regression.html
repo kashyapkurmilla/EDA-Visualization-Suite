@@ -32,7 +32,7 @@
     </div>
     <div class="main-container">
         <div class="form-container">
-            <h1>Run Linear Regression</h1>
+            <h1>Run Regression Analysis</h1>
             <form id="regression-form">
                 <label for="dependent_variable">Dependent Variable:</label>
                 <select id="dependent_variable" name="dependent_variable">
@@ -40,12 +40,25 @@
                     <option value="{{ column }}">{{ column }}</option>
                     {% endfor %}
                 </select>
+
                 <label for="independent_variable">Choose columns:</label>
                 <select id="independent_variable" name="independent_variable" multiple>
                     {% for column in columns %}
                     <option value="{{ column }}">{{ column }}</option>
                     {% endfor %}
                 </select>
+
+                <label for="regression_model">Select Regression Model:</label>
+                <select id="regression_model" name="regression_model">
+                    <option value="linear_regression">Linear Regression</option>
+                    <option value="decision_tree">Decision Tree Regressor</option>
+                    <option value="random_forest">Random Forest Regressor</option>
+                    <option value="adaboost">AdaBoost Regressor</option>
+                    <option value="bagging">Bagging Regressor</option>
+                    <option value="gradient_boosting">Gradient Boosting Regressor</option>
+                    <option value="lightgbm">LightGBM Regressor</option>
+                </select>
+
                 <button type="submit">Run Regression</button>
             </form>
             <script>

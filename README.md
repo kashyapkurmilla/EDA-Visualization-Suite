@@ -17,6 +17,7 @@ This Flask application is designed for data management, visualization, and analy
 - **Frontend:** HTML/CSS, Jinja2 templating
 - **Data Visualization:** Plotly, Plotly Dash
 - **Database:** MySQL
+- **Regression Analysis:** pycaret
 - **Other Libraries:** pandas, scikit-learn, scipy
 
 ## Setup Instructions

@@ -3,57 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Comparative Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/analysis.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/companalysis.css') }}">
 </head>
 <body>
     <div class="navbar">
         <img src="{{ url_for('static', filename='images/heading.png') }}" alt="Header Image" id="header-image">
         <div class="nav">
             <div class="dropdown">
-                <span class="dropbtn-text">Actions</span>
-                <div class="dropdown-content">
-                    <a href="#">Show or Hide Columns</a>
-                    <a href="#">Dataframe Functions</a>
-                    <a href="#">Summarize Data</a>
-                    <a href="#">Feature Analysis</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <span class="dropbtn-text">Visualize</span>
-                <div class="dropdown-content">
-                    <a href="/describe">Describe</a>
-                    <a href="/missingvalue/">Missing Analysis</a>
-                    <a href="/correlationmatrix/">Co-Relations</a>
-                    <a href="/charts">Charts</a>
-                </div>
-            </div>
-            <div class="dropdown" id="preprocessing-dropdown">
-                <span class="dropbtn-text">Pre-Processing</span>
-                <div class="dropdown-content">
-                    <a href="/transformations">Feature Engineering</a>
-                    <a href="/duplicates/">Duplicates</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <span class="dropbtn-text">Regression</span>
-                <div class="dropdown-content">
-                    <a href="/linearRegression">Linear Regression</a>
-                    <a href="#">Model Accuracy</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <span class="dropbtn-text">Report</span>
-                <div class="dropdown-content">
-                    <a href="#">Generate Report</a>
-                    <a href="#">Export Data</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <span class="dropbtn-text">Settings</span>
-                <div class="dropdown-content">
-                    <a href="#">Preferences</a>
-                    <a href="#">User Settings</a>
-                </div>
+                <a href="/dashboard" class="dropbtn-text">Dashboard</a>
             </div>
         </div>
     </div>
