@@ -16,7 +16,9 @@ from dashApp.statistics import create_stats_dash, update_stats_dash
 from sklearn.linear_model import LinearRegression
 import json
 from pycaret.classification import setup, compare_models, evaluate_model, pull, load_model, save_model,create_model
-
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+import numpy as np
 
 
 # Load environment variables
@@ -550,6 +552,66 @@ def comparativeanalysis():
     results_html = session.get('results_html', None)
 
     return render_template('companalysis.html', columns=columns, results_html=results_html)
+
+@app.route('/featureimportance', methods=['GET', 'POST'])
+def featureimportance():
+    global df
+
+    if df is None or df.empty:
+        print("Redirecting to dataPreview: df is None or empty")
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+
+    setup_df = df.copy()
+    target_column = None
+    feature_importance_html = None
+
+    if request.method == 'POST':
+        target_column = request.form.get('target_column')
+
+        print(f"Selected target column: {target_column}")
+
+        if target_column and target_column in setup_df.columns:
+            try:
+                
+                numeric_df = setup_df.select_dtypes(include=[np.number])
+                if target_column not in numeric_df.columns:
+                    numeric_df[target_column] = setup_df[target_column]
+
+                X = numeric_df.drop(columns=[target_column])
+                y = numeric_df[target_column]
+
+                
+                scaler = StandardScaler()
+                X_scaled = scaler.fit_transform(X)
+
+                model = RandomForestRegressor()
+                model.fit(X_scaled, y)
+
+                feature_importances = model.feature_importances_
+                feature_importance_df = pd.DataFrame({
+                    'Feature': X.columns,
+                    'Importance': feature_importances
+                }).sort_values(by='Importance', ascending=False)
+
+                feature_importance_html = feature_importance_df.to_html(classes='data-table', header="true", index=False)
+                session['feature_importance_html'] = feature_importance_html
+
+                print("Feature importance HTML:")
+                return render_template('featureimportance.html', target_column=target_column,
+                                       columns=setup_df.columns.tolist(),
+                                       feature_importance_html=feature_importance_html)
+
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                flash(f"An error occurred: {e}", 'danger')
+
+    columns = df.columns.tolist()
+    print("Columns available for selection:")
+    print(columns)
+
+    feature_importance_html = session.get('feature_importance_html', None)
+
+    return render_template('featureimportance.html', columns=columns, feature_importance_html=feature_importance_html)
 
 # Run the application
 if __name__ == '__main__':
