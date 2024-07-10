@@ -563,16 +563,19 @@ def featureimportance():
 
     setup_df = df.copy()
     target_column = None
-    feature_importance_html = None
+    model_type = None
+    feature_importances_html = None
+    columns = setup_df.columns.tolist()  # Keep columns list for rendering dropdown options
 
     if request.method == 'POST':
         target_column = request.form.get('target_column')
+        model_type = request.form.get('model_type')
 
         print(f"Selected target column: {target_column}")
+        print(f"Selected model type: {model_type}")
 
         if target_column and target_column in setup_df.columns:
             try:
-                
                 numeric_df = setup_df.select_dtypes(include=[np.number])
                 if target_column not in numeric_df.columns:
                     numeric_df[target_column] = setup_df[target_column]
@@ -580,38 +583,41 @@ def featureimportance():
                 X = numeric_df.drop(columns=[target_column])
                 y = numeric_df[target_column]
 
-                
                 scaler = StandardScaler()
                 X_scaled = scaler.fit_transform(X)
 
-                model = RandomForestRegressor()
-                model.fit(X_scaled, y)
+                if model_type == 'random_forest':
+                    model = RandomForestRegressor()
+                elif model_type == 'linear_regression':
+                    model = LinearRegression()
+                else:
+                    raise ValueError("Invalid model type selected")
 
-                feature_importances = model.feature_importances_
-                feature_importance_df = pd.DataFrame({
+                model.fit(X_scaled, y)
+                if model_type == 'random_forest':
+                    importances = model.feature_importances_
+                elif model_type == 'linear_regression':
+                    importances = np.abs(model.coef_)
+
+                feature_importances = pd.DataFrame({
                     'Feature': X.columns,
-                    'Importance': feature_importances
+                    'Importance': importances
                 }).sort_values(by='Importance', ascending=False)
 
-                feature_importance_html = feature_importance_df.to_html(classes='data-table', header="true", index=False)
-                session['feature_importance_html'] = feature_importance_html
-
-                print("Feature importance HTML:")
-                return render_template('featureimportance.html', target_column=target_column,
-                                       columns=setup_df.columns.tolist(),
-                                       feature_importance_html=feature_importance_html)
+                feature_importances_html = feature_importances.to_html(classes='data-table', header="true", index=False)
+                session['feature_importances_html'] = feature_importances_html
 
             except Exception as e:
                 print(f"Error occurred: {e}")
                 flash(f"An error occurred: {e}", 'danger')
 
-    columns = df.columns.tolist()
-    print("Columns available for selection:")
-    print(columns)
+    feature_importances_html = session.get('feature_importances_html', None)
 
-    feature_importance_html = session.get('feature_importance_html', None)
-
-    return render_template('featureimportance.html', columns=columns, feature_importance_html=feature_importance_html)
+    return render_template('featureimportance.html', 
+                           columns=columns, 
+                           feature_importances_html=feature_importances_html, 
+                           target_column=target_column, 
+                           model_type=model_type)
 
 # Run the application
 if __name__ == '__main__':

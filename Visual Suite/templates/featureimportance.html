@@ -62,18 +62,25 @@
         <form id="feature-importance-form" method="POST">
             <div class="form-group">
                 <label for="target_column">Select Target Column:</label>
-                <select id="target_column" name="target_column" class="" required>
+                <select id="target_column" name="target_column" required>
                     {% for column in columns %}
                     <option value="{{ column }}">{{ column }}</option>
                     {% endfor %}
                 </select>
             </div>
+            <div class="form-group">
+                <label for="model_type">Select Model Type:</label>
+                <select id="model_type" name="model_type" required>
+                    <option value="random_forest">Random Forest Regressor</option>
+                    <option value="linear_regression">Linear Regressor</option>
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Compute Feature Importance</button>
         </form>
 
-        {% if feature_importance_html %}
+        {% if feature_importances_html %}
         <div class="table-responsive">
-            {{ feature_importance_html|safe }}
+            {{ feature_importances_html|safe }}
         </div>
         {% endif %}
     </div>
