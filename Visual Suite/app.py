@@ -18,8 +18,7 @@ import json
 from pycaret.classification import setup, compare_models, evaluate_model, pull, load_model, save_model,create_model
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
-import lightgbm as lgb
-
+from lightgbm import LGBMRegressor
 
 
 # Load environment variables
@@ -433,158 +432,110 @@ def describe():
 
 @app.route('/regression', methods=['GET'])
 #@login_required
-def linear_regression():
+def regression():
     global df
     if df is None or df.empty:
         return redirect(url_for('dataPreview')) 
     columns = df.select_dtypes(include='number').columns.tolist()
     return render_template('regression.html', columns=columns)
 
-# @app.route('/run_regression', methods=['POST'])
-# def run_regression():
-#     global df
-#     if df is None or df.empty:
-#         return jsonify({'error': 'No dataset available'})
-
-#     dependent_var = request.form.get('dependent_variable')
-#     independent_vars = request.form.getlist('independent_variable')
-
-#     if dependent_var not in df.columns or not all(var in df.columns for var in independent_vars):
-#         return jsonify({'error': 'Invalid columns selected'})
-
-#     non_numeric_columns = [var for var in independent_vars if not pd.api.types.is_numeric_dtype(df[var])]
-#     if not pd.api.types.is_numeric_dtype(df[dependent_var]):
-#         non_numeric_columns.append(dependent_var)
-
-#     if non_numeric_columns:
-#         return jsonify({'error': f'Non-numeric columns selected: {", ".join(non_numeric_columns)}'})
-
-#     X = df[independent_vars].values
-#     y = df[dependent_var].values
-
-#     model = LinearRegression()
-#     model.fit(X, y)
-#     intercept = model.intercept_
-#     coefficients = dict(zip(independent_vars, model.coef_))
-
-#     if len(independent_vars) == 1:
-#         fig = px.scatter(df, x=independent_vars[0], y=dependent_var, title=f'{dependent_var} vs {independent_vars[0]}')
-#         fig.add_trace(px.line(df, x=independent_vars[0], y=model.predict(X), labels={independent_vars[0]: 'x', dependent_var: 'y'}).data[0])
-#         plot_data = fig.to_json()
-#     else:
-#         plot_data = json.dumps({'message': 'Plotting not available for multiple independent variables'})
-
-#     # Generate pair plot
-#     pair_fig = px.scatter_matrix(df, dimensions=independent_vars + [dependent_var], title="Pair Plot")
-#     pair_plot_data = pair_fig.to_json()
-
-#     # Generate correlation heatmap
-#     corr_matrix = df[independent_vars + [dependent_var]].corr()
-#     heatmap_fig = px.imshow(corr_matrix, text_auto=True, title="Correlation Heatmap")
-#     correlation_heatmap = heatmap_fig.to_json()
-
-#     return jsonify({
-#         'intercept': intercept,
-#         'coefficients': coefficients,
-#         'plot_data': plot_data,
-#         'pair_plot_data': pair_plot_data,
-#         'correlation_heatmap': correlation_heatmap
-#     })
-
 @app.route('/run_regression', methods=['POST'])
 def run_regression():
     global df
-    if df is None or df.empty:
-        return jsonify({'error': 'No dataset available'})
-
-    dependent_var = request.form.get('dependent_variable')
-    independent_vars = request.form.getlist('independent_variable')
-    regression_model = request.form.get('regression_model')
-
-    if dependent_var not in df.columns or not all(var in df.columns for var in independent_vars):
-        return jsonify({'error': 'Invalid columns selected'})
-
-    non_numeric_columns = [var for var in independent_vars if not pd.api.types.is_numeric_dtype(df[var])]
-    if not pd.api.types.is_numeric_dtype(df[dependent_var]):
-        non_numeric_columns.append(dependent_var)
-
-    if non_numeric_columns:
-        return jsonify({'error': f'Non-numeric columns selected: {", ".join(non_numeric_columns)}'})
-
-    X = df[independent_vars].values
-    y = df[dependent_var].values
-
-    if regression_model == 'linear_regression':
-        model = LinearRegression()
-    elif regression_model == 'decision_tree':
-        model = DecisionTreeRegressor()
-    elif regression_model == 'random_forest':
-        model = RandomForestRegressor()
-    elif regression_model == 'adaboost':
-        model = AdaBoostRegressor()
-    elif regression_model == 'bagging':
-        model = BaggingRegressor()
-    elif regression_model == 'gradient_boosting':
-        model = GradientBoostingRegressor()
-    elif regression_model == 'lightgbm':
-        model = lgb.LGBMRegressor()
-    else:
-        return jsonify({'error': 'Invalid regression model selected'})
-
-    model.fit(X, y)
-    intercept = model.intercept_
-    coefficients = dict(zip(independent_vars, model.coef_))
-
-    if len(independent_vars) == 1:
-        fig = px.scatter(df, x=independent_vars[0], y=dependent_var, title=f'{dependent_var} vs {independent_vars[0]}')
-        fig.add_trace(px.line(df, x=independent_vars[0], y=model.predict(X), labels={independent_vars[0]: 'x', dependent_var: 'y'}).data[0])
-        plot_data = fig.to_json()
-    else:
-        plot_data = json.dumps({'message': 'Plotting not available for multiple independent variables'})
-
-    # Generate pair plot
-    pair_fig = px.scatter_matrix(df, dimensions=independent_vars + [dependent_var], title="Pair Plot")
-    pair_plot_data = pair_fig.to_json()
-
-    # Generate correlation heatmap
-    corr_matrix = df[independent_vars + [dependent_var]].corr()
-    heatmap_fig = px.imshow(corr_matrix, text_auto=True, title="Correlation Heatmap")
-    correlation_heatmap = heatmap_fig.to_json()
-
-    return jsonify({
-        'intercept': intercept,
-        'coefficients': coefficients,
-        'plot_data': plot_data,
-        'pair_plot_data': pair_plot_data,
-        'correlation_heatmap': correlation_heatmap
-    })
-
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    global df
-
-    data = request.form.to_dict()
-    dependent_variable = data['dependent_variable']
-    independent_variables = data['independent_variable'].split(',')
-    input_values = list(map(float, data['input_values'].split(',')))
-
-    if df is None or dependent_variable not in df.columns or not all(var in df.columns for var in independent_variables):
-        return jsonify(error="Invalid columns selected")
 
     try:
-        X = df[independent_variables].values
-        y = df[dependent_variable].values
+        if df is None or df.empty:
+            return jsonify({'error': 'No data available. Please upload a dataset.'})
 
-        model = LinearRegression()
+        # Get form data
+        dependent_variable = request.form['dependent_variable']
+        independent_variables = request.form.getlist('independent_variable')
+        regression_model = request.form['regression_model']
+
+        # Check if the form data is valid
+        if not dependent_variable or not independent_variables or not regression_model:
+            return jsonify({'error': 'Please provide all required inputs (dependent variable, independent variables, and regression model).'})
+
+        # Prepare data
+        X = df[independent_variables]
+        y = df[dependent_variable]
+
+        # Initialize the selected regression model
+        model = None
+        model_type = 'linear'
+        if regression_model == 'linear_regression':
+            model = LinearRegression()
+        elif regression_model == 'decision_tree':
+            model = DecisionTreeRegressor()
+            model_type = 'tree'
+        elif regression_model == 'random_forest':
+            model = RandomForestRegressor()
+            model_type = 'ensemble'
+        elif regression_model == 'adaboost':
+            model = AdaBoostRegressor()
+            model_type = 'ensemble'
+        elif regression_model == 'bagging':
+            base_model = DecisionTreeRegressor()  # Example base model
+            model = BaggingRegressor(base_model)
+            model_type = 'ensemble'
+        elif regression_model == 'gradient_boosting':
+            model = GradientBoostingRegressor()
+            model_type = 'ensemble'
+        elif regression_model == 'lightgbm':
+            model = LGBMRegressor()
+            model_type = 'ensemble'
+        else:
+            return jsonify({'error': 'Invalid regression model selected'})
+
+        # Fit the model
         model.fit(X, y)
 
-        predicted_value = model.predict([input_values])[0]
+        # Prepare results for visualization
+        plot_data = []
+        pair_plot_data = []
+        correlation_heatmap_data = []
 
-        return jsonify(predicted_value=predicted_value)
+        if len(independent_variables) == 1:
+            x_values = df[independent_variables[0]]
+            fig = px.scatter(x=x_values, y=model.predict(X), labels={'x': independent_variables[0], 'y': 'Predicted'})
+            plot_data = json.loads(fig.to_json())
+        else:
+            # Pair plot and correlation heatmap for multiple independent variables
+            pair_plot = px.scatter_matrix(df, dimensions=independent_variables, color=dependent_variable)
+            correlation_heatmap = px.imshow(df[independent_variables + [dependent_variable]].corr(), text_auto=True)
+            pair_plot_data = json.loads(pair_plot.to_json())
+            correlation_heatmap_data = json.loads(correlation_heatmap.to_json())
+
+        result = {}
+        if model_type == 'linear':
+            result['intercept'] = model.intercept_
+            result['coefficients'] = model.coef_.tolist()
+        elif model_type == 'tree' or model_type == 'ensemble':
+            # Access feature importances for decision tree-based models
+            if hasattr(model, 'feature_importances_'):
+                result['feature_importances'] = model.feature_importances_.tolist()
+            else:
+                # For ensemble methods like BaggingRegressor, get feature importances from base estimator
+                if hasattr(model, 'base_estimator_'):
+                    base_model = model.base_estimator_
+                    if hasattr(base_model, 'feature_importances_'):
+                        result['feature_importances'] = base_model.feature_importances_.tolist()
+                    else:
+                        return jsonify({'error': 'Base estimator does not support feature importances.'})
+                else:
+                    return jsonify({'error': 'Model does not support feature importances.'})
+
+        result.update({
+            'plot_data': plot_data,
+            'pair_plot_data': pair_plot_data,
+            'correlation_heatmap_data': correlation_heatmap_data
+        })
+
+        return jsonify(result)
 
     except Exception as e:
-        return jsonify(error=str(e))
+        return jsonify({'error': str(e)})
+
     
 @app.route('/comparativeanalysis', methods=['GET', 'POST'])
 def comparativeanalysis():
