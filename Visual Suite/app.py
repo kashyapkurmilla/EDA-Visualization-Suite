@@ -18,7 +18,8 @@ import json
 from pycaret.classification import setup, compare_models, evaluate_model, pull, load_model, save_model,create_model
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
-import numpy as npfrom sklearn.tree import DecisionTreeRegressor
+import numpy as np 
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 
@@ -590,6 +591,71 @@ def comparativeanalysis():
 
     return render_template('companalysis.html', columns=columns, results_html=results_html)
 
+@app.route('/featureimportance', methods=['GET', 'POST'])
+def featureimportance():
+    global df
+
+    if df is None or df.empty:
+        print("Redirecting to dataPreview: df is None or empty")
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+
+    setup_df = df.copy()
+    target_column = None
+    model_type = None
+    feature_importances_html = None
+    columns = setup_df.columns.tolist()  # Keep columns list for rendering dropdown options
+
+    if request.method == 'POST':
+        target_column = request.form.get('target_column')
+        model_type = request.form.get('model_type')
+
+        print(f"Selected target column: {target_column}")
+        print(f"Selected model type: {model_type}")
+
+        if target_column and target_column in setup_df.columns:
+            try:
+                numeric_df = setup_df.select_dtypes(include=[np.number])
+                if target_column not in numeric_df.columns:
+                    numeric_df[target_column] = setup_df[target_column]
+
+                X = numeric_df.drop(columns=[target_column])
+                y = numeric_df[target_column]
+
+                scaler = StandardScaler()
+                X_scaled = scaler.fit_transform(X)
+
+                if model_type == 'random_forest':
+                    model = RandomForestRegressor()
+                elif model_type == 'linear_regression':
+                    model = LinearRegression()
+                else:
+                    raise ValueError("Invalid model type selected")
+
+                model.fit(X_scaled, y)
+                if model_type == 'random_forest':
+                    importances = model.feature_importances_
+                elif model_type == 'linear_regression':
+                    importances = np.abs(model.coef_)
+
+                feature_importances = pd.DataFrame({
+                    'Feature': X.columns,
+                    'Importance': importances
+                }).sort_values(by='Importance', ascending=False)
+
+                feature_importances_html = feature_importances.to_html(classes='data-table', header="true", index=False)
+                session['feature_importances_html'] = feature_importances_html
+
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                flash(f"An error occurred: {e}", 'danger')
+
+    feature_importances_html = session.get('feature_importances_html', None)
+
+    return render_template('featureimportance.html', 
+                           columns=columns, 
+                           feature_importances_html=feature_importances_html, 
+                           target_column=target_column, 
+                           model_type=model_type)
 # Run application
 if __name__ == '__main__':
     app.run(debug=True)
