@@ -16,7 +16,9 @@ from dashApp.statistics import create_stats_dash, update_stats_dash
 from sklearn.linear_model import LinearRegression
 import json
 from pycaret.classification import setup, compare_models, evaluate_model, pull, load_model, save_model,create_model
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+import numpy as npfrom sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 
