@@ -136,7 +136,7 @@ def dataPreview():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     global df  # Declare the global variable
-
+    global df_copy
     if 'file' not in request.files:
         return jsonify(error="No file part")
 
@@ -148,6 +148,7 @@ def upload_file():
         try:
             # Attempt to read the CSV file with utf-8 encoding
             df = pd.read_csv(file.stream, encoding='utf-8')
+            df_copy=df.copy(deep=True)
         except UnicodeDecodeError:
             # If utf-8 fails, try another encoding (e.g., Latin-1)
             try:
@@ -280,15 +281,15 @@ def duplicates():
 
 # Route for transformations
 @app.route('/transformations', methods=['GET', 'POST'])
-#@login_required
 def transformations():
     global df
-
+    global df_copy
     if df is None or df.empty:
         return redirect(url_for('dataPreview'))
 
     # Work with a deep copy of the original dataframe for preprocessing
     temp_df = df.copy(deep=True)
+    original_df = df_copy.copy(deep=True)
 
     # Retrieve checkbox states and selected columns from session
     log_transformation_checked = session.get('log_transformation_checked', False)
@@ -297,9 +298,6 @@ def transformations():
     normalization_checked = session.get('normalization_checked', False)
     selected_one_hot_column = session.get('selected_one_hot_column', '')
     selected_label_column = session.get('selected_label_column', '')
-
-    # Initial table display
-    table_html = temp_df.head(50).to_html(classes='data-table', header="true", index=False)
 
     if request.method == 'POST':
         # Handle transformation options
@@ -353,13 +351,15 @@ def transformations():
         # Reset to original state if no options are selected
         if not log_transformation_checked and not box_cox_transformation_checked and not standardization_checked \
                 and not normalization_checked and not selected_one_hot_column and not selected_label_column:
-            temp_df = df.copy(deep=True)
+            temp_df = original_df.copy(deep=True)
 
         # Update df with transformed data
         df = temp_df
-
-        # Update table display after transformations
-        table_html = temp_df.head(50).to_html(classes='data-table', header="true", index=False)
+        update_dash_app(dash_app1,df)
+        update_cm_dash(dash_app2,df)
+        update_stats_dash(dash_app3,df)
+    # Update table display after transformations
+    table_html = temp_df.head(50).to_html(classes='data-table', header="true", index=False)
 
     return render_template('transformations.html', df=table_html,
                            log_transformation_checked=log_transformation_checked,
