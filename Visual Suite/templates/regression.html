@@ -52,65 +52,24 @@
                 new MultiSelectTag('independent_variable'); // Initialize the multi-select tag
             </script>
             <div id="regression-result" style="margin-top: 20px;"></div>
-
+        </div>
+        <div class="visualization-container">
             <!-- Radio buttons for selecting chart type -->
-            <div class="radio-block">
+            <div class="radio-block" id="chart-options">
                 <input type="radio" id="pairplot" name="chart_type" value="pairplot" checked>
                 <label for="pairplot">Pair Plot</label>
 
                 <input type="radio" id="heatmap" name="chart_type" value="heatmap">
                 <label for="heatmap">Heatmap</label>
             </div>
-        </div>
-        <div class="visualization-container">
             <div class="chart-container">
                 <div id="pair-plot" class="active"></div>
                 <div id="correlation-heatmap"></div>
-            </div>
-            <div id="regression-plot" class="chart-container">
+                <div id="regression-plot"></div>
             </div>
         </div>
     </div>
     <script>
-        // document.getElementById('regression-form').onsubmit = function (event) {
-        //     event.preventDefault();
-        //     const formData = new FormData(event.target);
-        //     fetch('/run_regression', {
-        //         method: 'POST',
-        //         body: formData
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         if (data.error) {
-        //             document.getElementById('regression-result').innerText = data.error;
-        //         } else {
-        //             if (data.intercept !== undefined && data.coefficients !== undefined) {
-        //                 document.getElementById('regression-result').innerText = `Intercept: ${data.intercept}, Coefficients: ${JSON.stringify(data.coefficients)}`;
-        //             } else if (data.feature_importances !== undefined) {
-        //                 document.getElementById('regression-result').innerText = `Feature Importances: ${JSON.stringify(data.feature_importances)}`;
-        //             }
-
-        //             // Clear previous plots
-        //             Plotly.purge('regression-plot');
-        //             Plotly.purge('pair-plot');
-        //             Plotly.purge('correlation-heatmap');
-
-        //             // Display or hide charts based on selection
-        //             const chartType = document.querySelector('input[name="chart_type"]:checked').value;
-        //             if (chartType === 'pairplot') {
-        //                 document.getElementById('pair-plot').classList.add('active');
-        //                 document.getElementById('correlation-heatmap').classList.remove('active');
-        //                 Plotly.newPlot('pair-plot', data.pair_plot_data.data, data.pair_plot_data.layout);
-        //             } else if (chartType === 'heatmap') {
-        //                 document.getElementById('pair-plot').classList.remove('active');
-        //                 document.getElementById('correlation-heatmap').classList.add('active');
-        //                 Plotly.newPlot('correlation-heatmap', data.correlation_heatmap_data.data, data.correlation_heatmap_data.layout);
-        //             }
-        //         }
-        //     })
-        //     .catch(error => console.error('Error:', error));
-        // };
-
         document.addEventListener('DOMContentLoaded', function () {
             // Function to fetch data and update plots
             function fetchDataAndPlot(formData) {
@@ -145,6 +104,11 @@
                                 document.getElementById('pair-plot').classList.remove('active');
                                 document.getElementById('correlation-heatmap').classList.add('active');
                                 Plotly.newPlot('correlation-heatmap', data.correlation_heatmap_data.data, data.correlation_heatmap_data.layout);
+                            }
+
+                            // Display regression plot if provided
+                            if (data.regression_plot_data) {
+                                Plotly.newPlot('regression-plot', data.regression_plot_data.data, data.regression_plot_data.layout);
                             }
                         }
                     })
@@ -184,8 +148,19 @@
                     }
                 });
             });
-        });
 
+            // Event listener for changes in independent variable selection
+            document.getElementById('independent_variable').addEventListener('change', function () {
+                const selectedOptions = this.selectedOptions;
+                const chartOptions = document.getElementById('chart-options');
+
+                if (selectedOptions.length > 1) {
+                    chartOptions.style.display = 'block';
+                } else {
+                    chartOptions.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 

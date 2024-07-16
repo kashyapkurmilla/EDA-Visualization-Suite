@@ -19,108 +19,33 @@ body {
     align-items: center;
 }
 
-.nav {
-    display: flex;
-    align-items: center;
-}
-
 .nav img {
     max-width: 50px;
     height: auto;
 }
 
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-left: auto;
-}
-
-.dropdown {
-    position: relative;
-}
-
-.dropbtn-text {
-    margin-right: 5px;
-    margin-left: 5px;
-    font-size: 14px;
-    cursor: pointer;
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-    position: relative;
-    padding-bottom: 5px;
-}
-
-.dropbtn-text::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    transform: scaleX(0);
-    height: 2px;
-    bottom: 0;
-    left: 0;
-    background-color: #FFB400;
-    transform-origin: bottom right;
-    transition: transform 0.25s ease-out;
-    z-index: 1;
-}
-
-.dropbtn-text:hover::after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #262626;
-    min-width: 140px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 2;
-    border-radius: 8px;
-    top: 100%;
-    margin-top: 5px;
-}
-
-.dropdown-content a {
-    color: #ffffff;
-    padding: 8px 10px;
-    text-decoration: none;
-    display: block;
-    transition: background-color 0.2s ease;
-}
-
-.dropdown-content a:hover {
-    background-color: #3d3d3d;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
 .main-container {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: center;
     max-width: 1200px;
     margin: 100px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.form-container {
+.form-container, .visualization-container {
     flex: 1;
     margin: 10px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.visualization-container {
-    flex: 2;
-    margin: 10px;
-}
-
-h1, h2 {
+h1 {
     text-align: center;
     margin-bottom: 20px;
     color: #FFB400;
@@ -136,7 +61,7 @@ label {
     color: #333;
 }
 
-select, button, input[type="text"] {
+select, button {
     margin-bottom: 16px;
     padding: 8px;
     font-size: 16px;
@@ -157,20 +82,16 @@ button:hover {
     background-color: #e6a700;
 }
 
-#regression-result, #prediction-result {
+#regression-result {
     padding: 10px;
     background-color: #f1f1f1;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-#regression-plot, #pair-plot, #correlation-heatmap {
-    width: 100%;
-    height: 400px;
-    margin-top: 20px;
-}
 .radio-block {
     display: flex;
+    justify-content: center;
     gap: 10px;
     margin-top: 10px;
 }
@@ -197,19 +118,17 @@ button:hover {
     color: #fff;
 }
 
-/* Chart display styling */
 .chart-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    flex-wrap: wrap;
     gap: 20px;
     margin-top: 20px;
 }
 
 .chart-container > div {
     width: 100%;
-    height: 500px;
+    height: 400px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f9f9f9;

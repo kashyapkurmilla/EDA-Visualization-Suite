@@ -166,6 +166,7 @@ def upload_file():
     return jsonify(error="Invalid file type")
 
 
+# Route for dashboard
 @app.route('/dashboard')
 #@login_required
 def dashboard():
@@ -200,8 +201,8 @@ def dashboard():
             initial_column = col
             # Ensure the 'size' column contains non-negative values
             abs_col_values = df[initial_column].abs()
-            fig = px.scatter(df, x=initial_column, y=df.index, size=abs_col_values,
-                             hover_name=df.index, log_x=True, size_max=60)
+            fig = px.scatter(df, x=df.index, y=initial_column, size=abs_col_values,
+                             hover_name=df.index, log_y=True, size_max=60)
             fig.update_layout(height=600)  # Set initial height
             initial_viz = fig.to_html(full_html=False, default_height=400)
             break
@@ -402,13 +403,13 @@ def generate_chart():
         elif chart_type == 'scatter':
             fig = px.scatter(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
         elif chart_type == 'heatmap':
-            fig = px.imshow(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis}')
-            fig.update_layout(title=f'{y_axis} vs {x_axis} (Heatmap)')  # Optional: Update heatmap layout
+            fig = px.density_heatmap(df, x=x_axis, y=y_axis, title=f'{y_axis} vs {x_axis} (Heatmap)')
 
         graph_json = fig.to_json()  # Convert the figure to JSON serializable format
         return jsonify({'data': graph_json})  # Return the JSON-serializable data
     except Exception as e:
         return jsonify({'error': str(e)})
+
 
 
 
@@ -511,18 +512,18 @@ def run_regression():
 
         result = {}
         if model_type == 'linear':
-            result['intercept'] = model.intercept_
-            result['coefficients'] = model.coef_.tolist()
+            result['intercept'] = round(model.intercept_, 2)
+            result['coefficients'] = [round(coef, 2) for coef in model.coef_]
         elif model_type == 'tree' or model_type == 'ensemble':
             # Access feature importances for decision tree-based models
             if hasattr(model, 'feature_importances_'):
-                result['feature_importances'] = model.feature_importances_.tolist()
+                result['feature_importances'] = [round(importance, 2) for importance in model.feature_importances_]
             else:
                 # For ensemble methods like BaggingRegressor, get feature importances from base estimator
                 if hasattr(model, 'base_estimator_'):
                     base_model = model.base_estimator_
                     if hasattr(base_model, 'feature_importances_'):
-                        result['feature_importances'] = base_model.feature_importances_.tolist()
+                        result['feature_importances'] = [round(importance, 2) for importance in base_model.feature_importances_]
                     else:
                         return jsonify({'error': 'Base estimator does not support feature importances.'})
                 else:
@@ -538,6 +539,72 @@ def run_regression():
 
     except Exception as e:
         return jsonify({'error': str(e)})
+
+@app.route('/featureimportance', methods=['GET', 'POST'])
+def featureimportance():
+    global df
+
+    if df is None or df.empty:
+        print("Redirecting to dataPreview: df is None or empty")
+        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+
+    setup_df = df.copy()
+    target_column = None
+    model_type = None
+    feature_importances_html = None
+    columns = setup_df.columns.tolist()  # Keep columns list for rendering dropdown options
+
+    if request.method == 'POST':
+        target_column = request.form.get('target_column')
+        model_type = request.form.get('model_type')
+
+        print(f"Selected target column: {target_column}")
+        print(f"Selected model type: {model_type}")
+
+        if target_column and target_column in setup_df.columns:
+            try:
+                numeric_df = setup_df.select_dtypes(include=[np.number])
+                if target_column not in numeric_df.columns:
+                    numeric_df[target_column] = setup_df[target_column]
+
+                X = numeric_df.drop(columns=[target_column])
+                y = numeric_df[target_column]
+
+                scaler = StandardScaler()
+                X_scaled = scaler.fit_transform(X)
+
+                if model_type == 'random_forest':
+                    model = RandomForestRegressor()
+                elif model_type == 'linear_regression':
+                    model = LinearRegression()
+                else:
+                    raise ValueError("Invalid model type selected")
+
+                model.fit(X_scaled, y)
+                if model_type == 'random_forest':
+                    importances = model.feature_importances_
+                elif model_type == 'linear_regression':
+                    importances = np.abs(model.coef_)
+
+                feature_importances = pd.DataFrame({
+                    'Feature': X.columns,
+                    'Importance': [round(imp, 2) for imp in importances]
+                }).sort_values(by='Importance', ascending=False)
+
+                feature_importances_html = feature_importances.to_html(classes='data-table', header="true", index=False)
+                session['feature_importances_html'] = feature_importances_html
+
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                flash(f"An error occurred: {e}", 'danger')
+
+    feature_importances_html = session.get('feature_importances_html', None)
+
+    return render_template('featureimportance.html', 
+                           columns=columns, 
+                           feature_importances_html=feature_importances_html, 
+                           target_column=target_column, 
+                           model_type=model_type)
 
     
 @app.route('/comparativeanalysis', methods=['GET', 'POST'])
@@ -591,71 +658,71 @@ def comparativeanalysis():
 
     return render_template('companalysis.html', columns=columns, results_html=results_html)
 
-@app.route('/featureimportance', methods=['GET', 'POST'])
-def featureimportance():
-    global df
+# @app.route('/featureimportance', methods=['GET', 'POST'])
+# def featureimportance():
+#     global df
 
-    if df is None or df.empty:
-        print("Redirecting to dataPreview: df is None or empty")
-        return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+#     if df is None or df.empty:
+#         print("Redirecting to dataPreview: df is None or empty")
+#         return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
 
-    setup_df = df.copy()
-    target_column = None
-    model_type = None
-    feature_importances_html = None
-    columns = setup_df.columns.tolist()  # Keep columns list for rendering dropdown options
+#     setup_df = df.copy()
+#     target_column = None
+#     model_type = None
+#     feature_importances_html = None
+#     columns = setup_df.columns.tolist()  # Keep columns list for rendering dropdown options
 
-    if request.method == 'POST':
-        target_column = request.form.get('target_column')
-        model_type = request.form.get('model_type')
+#     if request.method == 'POST':
+#         target_column = request.form.get('target_column')
+#         model_type = request.form.get('model_type')
 
-        print(f"Selected target column: {target_column}")
-        print(f"Selected model type: {model_type}")
+#         print(f"Selected target column: {target_column}")
+#         print(f"Selected model type: {model_type}")
 
-        if target_column and target_column in setup_df.columns:
-            try:
-                numeric_df = setup_df.select_dtypes(include=[np.number])
-                if target_column not in numeric_df.columns:
-                    numeric_df[target_column] = setup_df[target_column]
+#         if target_column and target_column in setup_df.columns:
+#             try:
+#                 numeric_df = setup_df.select_dtypes(include=[np.number])
+#                 if target_column not in numeric_df.columns:
+#                     numeric_df[target_column] = setup_df[target_column]
 
-                X = numeric_df.drop(columns=[target_column])
-                y = numeric_df[target_column]
+#                 X = numeric_df.drop(columns=[target_column])
+#                 y = numeric_df[target_column]
 
-                scaler = StandardScaler()
-                X_scaled = scaler.fit_transform(X)
+#                 scaler = StandardScaler()
+#                 X_scaled = scaler.fit_transform(X)
 
-                if model_type == 'random_forest':
-                    model = RandomForestRegressor()
-                elif model_type == 'linear_regression':
-                    model = LinearRegression()
-                else:
-                    raise ValueError("Invalid model type selected")
+#                 if model_type == 'random_forest':
+#                     model = RandomForestRegressor()
+#                 elif model_type == 'linear_regression':
+#                     model = LinearRegression()
+#                 else:
+#                     raise ValueError("Invalid model type selected")
 
-                model.fit(X_scaled, y)
-                if model_type == 'random_forest':
-                    importances = model.feature_importances_
-                elif model_type == 'linear_regression':
-                    importances = np.abs(model.coef_)
+#                 model.fit(X_scaled, y)
+#                 if model_type == 'random_forest':
+#                     importances = model.feature_importances_
+#                 elif model_type == 'linear_regression':
+#                     importances = np.abs(model.coef_)
 
-                feature_importances = pd.DataFrame({
-                    'Feature': X.columns,
-                    'Importance': importances
-                }).sort_values(by='Importance', ascending=False)
+#                 feature_importances = pd.DataFrame({
+#                     'Feature': X.columns,
+#                     'Importance': importances
+#                 }).sort_values(by='Importance', ascending=False)
 
-                feature_importances_html = feature_importances.to_html(classes='data-table', header="true", index=False)
-                session['feature_importances_html'] = feature_importances_html
+#                 feature_importances_html = feature_importances.to_html(classes='data-table', header="true", index=False)
+#                 session['feature_importances_html'] = feature_importances_html
 
-            except Exception as e:
-                print(f"Error occurred: {e}")
-                flash(f"An error occurred: {e}", 'danger')
+#             except Exception as e:
+#                 print(f"Error occurred: {e}")
+#                 flash(f"An error occurred: {e}", 'danger')
 
-    feature_importances_html = session.get('feature_importances_html', None)
+#     feature_importances_html = session.get('feature_importances_html', None)
 
-    return render_template('featureimportance.html', 
-                           columns=columns, 
-                           feature_importances_html=feature_importances_html, 
-                           target_column=target_column, 
-                           model_type=model_type)
+#     return render_template('featureimportance.html', 
+#                            columns=columns, 
+#                            feature_importances_html=feature_importances_html, 
+#                            target_column=target_column, 
+#                            model_type=model_type)
 # Run application
 if __name__ == '__main__':
     app.run(debug=True)
