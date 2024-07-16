@@ -8,3 +8,4 @@ scipy
 dash
 dash-bootstrap-components
 pycaret
+seaborn
