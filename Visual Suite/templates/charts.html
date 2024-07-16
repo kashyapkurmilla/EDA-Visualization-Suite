@@ -58,44 +58,47 @@
     </div>
 
     <script>
+        document.getElementById('x_axis').addEventListener('change', updateChart);
+        document.getElementById('y_axis').addEventListener('change', updateChart);
+
         document.querySelectorAll('input[name="chart_type"]').forEach(radio => {
-            radio.addEventListener('change', function () {
-                const xAxis = document.getElementById('x_axis').value;
-                const yAxis = document.getElementById('y_axis').value;
-
-                if (!xAxis || !yAxis) {
-                    alert('Please select both X and Y axes.');
-                    return;
-                }
-
-                const chartType = this.value;
-
-                fetch('/generate_chart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        x_axis: xAxis,
-                        y_axis: yAxis,
-                        chart_type: chartType
-                    }),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert(data.error);
-                            return;
-                        }
-                        const chartDiv = document.getElementById('chart');
-                        Plotly.newPlot(chartDiv, JSON.parse(data.data));  // Parse JSON here
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while generating the chart.');
-                    });
-            });
+            radio.addEventListener('change', updateChart);
         });
+
+        function updateChart() {
+            const xAxis = document.getElementById('x_axis').value;
+            const yAxis = document.getElementById('y_axis').value;
+            const chartType = document.querySelector('input[name="chart_type"]:checked')?.value;
+
+            if (!xAxis || !yAxis || !chartType) {
+                return; // Do nothing if any value is not selected
+            }
+
+            fetch('/generate_chart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    x_axis: xAxis,
+                    y_axis: yAxis,
+                    chart_type: chartType
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    const chartDiv = document.getElementById('chart');
+                    Plotly.newPlot(chartDiv, JSON.parse(data.data));
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while generating the chart.');
+                });
+        }
     </script>
 </body>
 

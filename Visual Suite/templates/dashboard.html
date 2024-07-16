@@ -42,7 +42,7 @@
             <div class="dropdown">
                 <span class="dropbtn-text">Report</span>
                 <div class="dropdown-content">
-                    <a href="#" >Generate Report</a>
+                    <a href="#">Generate Report</a>
                     <a href="{{ url_for('export_data') }}">Export Data</a>
                 </div>
             </div>
@@ -151,7 +151,14 @@
                 $(this).addClass('highlighted');
 
                 var selectedColumn = $(this).data('column');
-                updateVisualization(selectedColumn);
+                var columnType = $(this).find('td:nth-child(3)').text().trim(); // Get the data type of the column
+
+                // Check if the column type is numeric
+                if (columnType === 'int64' || columnType === 'float64') { // Adjust according to your actual data types
+                    updateVisualization(selectedColumn);
+                } else {
+                    alert("Only select Numeric Columns");
+                }
             });
 
             // Trigger initial visualization update based on the first column
@@ -159,6 +166,7 @@
             updateVisualization(initialColumn);
         });
     </script>
+
 
 </body>
 
