@@ -1,6 +1,7 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #000000; /* Dark background */
+    color: #ffffff; /* White text */
     margin: 0;
     padding: 0;
 }
@@ -10,7 +11,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #333333;
+    background-color: #222222; /* Darker navbar */
     padding: 15px 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1000;
@@ -28,27 +29,49 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    max-width: 1200px;
+    max-width: 1700px;
     margin: 100px auto;
-    background-color: #fff;
+    background-color: #000000; /* Dark background */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #000000;
+    margin-bottom: 20px;
 }
 
-.form-container, .visualization-container {
+.form-container{
     flex: 1;
     margin: 10px;
     padding: 20px;
-    background-color: #ffffff;
+    max-width: 500px;
+    background-color: #333333; /* Darker background */
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
+.visualization-container {
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+    max-width: 1200px;
+    background-color: #333333; /* Darker background */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.prediction-container{
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+    margin: 60px auto;
+    max-width: 800px;
+    background-color: #333333; /* Darker background */
+    border-radius: 8px;
+    color: #000000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 h1 {
     text-align: center;
     margin-bottom: 20px;
-    color: #FFB400;
+    color: #FFB400; /* Yellow */
 }
 
 form {
@@ -58,35 +81,54 @@ form {
 
 label {
     margin-bottom: 8px;
-    color: #333;
+    color: #ffffff; /* White text */
+    margin-top: 10px;
 }
-
+input{
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #444444; /* Darker grey */
+    color: #ffffff; 
+    border : none;
+}
 select, button {
     margin-bottom: 16px;
     padding: 8px;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    background-color: #444444; /* Darker grey */
+    color: #ffffff; /* White text */
+    width: 100%;
+    margin-top: 10px;
+    border : none;
 }
 
 button {
-    background-color: #FFB400;
-    color: white;
+    background-color: #FFB400; /* Yellow */
+    color: #000000; /* Black text */
     border: none;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s ease;
+    width: 50%;
+    margin: 0 auto;
+    margin-top: 10px;
+    
 }
 
 button:hover {
-    background-color: #e6a700;
+    background-color: #e6a700; /* Darker yellow on hover */
 }
 
 #regression-result {
     padding: 10px;
-    background-color: #f1f1f1;
+    background-color: #444444; /* Darker grey */
     border: 1px solid #ccc;
     border-radius: 5px;
+    color: #ffffff; /* White text */
 }
 
 .radio-block {
@@ -104,18 +146,18 @@ button:hover {
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 5px;
-    background-color: #eee;
-    color: #333;
+    background-color: #555555; /* Dark grey */
+    color: #ffffff; /* White text */
     transition: background-color 0.3s ease;
 }
 
 .radio-block label:hover {
-    background-color: #ddd;
+    background-color: #666666; /* Slightly lighter dark grey on hover */
 }
 
 .radio-block input[type="radio"]:checked + label {
-    background-color: #FFB400;
-    color: #fff;
+    background-color: #FFB400; /* Yellow */
+    color: #000000; /* Black text */
 }
 
 .chart-container {
@@ -128,13 +170,26 @@ button:hover {
 
 .chart-container > div {
     width: 100%;
-    height: 400px;
+    height: 600px; /* Increased height for larger graphs */
     border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #f9f9f9;
+    background-color: #444444; /* Darker grey */
     display: none;
 }
 
 .chart-container .active {
     display: block;
+}
+.prediction-results {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    border : none;
+    background-color: #444444;
+    color: #ffffff;
+}
+
+.result-item {
+    margin-bottom: 10px;
 }

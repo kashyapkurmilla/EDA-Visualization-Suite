@@ -139,7 +139,7 @@ def create_stats_dash(flask_app):
                                                 placeholder="Select a column",
                                                 style={'backgroundColor': '#444444', 'color': '#ffffff', 'font-size': '16px'}
                                             ),
-                                            html.Div(id="column-stats", className='mt-4', style={'font-size': '16px', 'color': 'white'})
+                                            html.Div(id="column-stats", className='mt-4', style={'font-size': '16px', 'color': 'black'})
                                         ]
                                     )
                                 ]

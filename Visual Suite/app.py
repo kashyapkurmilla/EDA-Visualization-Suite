@@ -23,6 +23,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 import io
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_percentage_error
 
 
 # Load environment variables
@@ -680,6 +681,45 @@ def export_data():
     )
     
     return response
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    global df
+    
+    data = request.form.to_dict()
+    dependent_variable = data.get('prediction_column')
+    independent_variables = request.form.getlist('independent_columns')
+    input_values = list(map(float, data.get('prediction_input').split(',')))
+
+    if df is None or dependent_variable not in df.columns or not all(var in df.columns for var in independent_variables):
+        return jsonify(error="Invalid columns selected")
+
+    try:
+        X = df[independent_variables].values
+        y = df[dependent_variable].values
+
+        model = LinearRegression()
+        model.fit(X, y)
+
+        predicted_value = model.predict([input_values])[0]
+
+        # Calculate metrics
+        r2 = r2_score(y, model.predict(X))
+        mse = mean_squared_error(y, model.predict(X))
+        rmse = np.sqrt(mse)
+        mape = mean_absolute_percentage_error(y, model.predict(X))
+
+        return jsonify(
+            prediction=predicted_value,
+            r2=r2,
+            mse=mse,
+            rmse=rmse,
+            mape=mape
+        )
+
+    except Exception as e:
+        return jsonify(error=str(e))
+
 
 # Run application
 if __name__ == '__main__':

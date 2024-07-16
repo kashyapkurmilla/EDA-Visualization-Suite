@@ -67,6 +67,61 @@
             </div>
         </div>
     </div>
+    <div class="prediction-container">
+        <h1>Predict Dependent Variable</h1>
+        <form id="prediction-form">
+            <label for="prediction_column">Select Dependent Variable:</label>
+            <select id="prediction_column" name="prediction_column">
+                {% for column in columns %}
+                <option value="{{ column }}">{{ column }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="independent_columns">Select Independent Variables:</label>
+            <select id="independent_columns" name="independent_columns" multiple>
+                {% for column in columns %}
+                <option value="{{ column }}">{{ column }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="prediction_input">Enter Independent Variables(Comma-Sperated):</label>
+            <input type="text" id="prediction_input" name="prediction_input" placeholder="e.g. 5.1,3.5,1.4,0.2">
+
+            <button type="submit">Predict</button>
+        </form>
+        <div id="prediction-result" class="prediction-results">
+            <!-- Placeholder for prediction results -->
+        </div>
+        <script>
+            new MultiSelectTag('independent_columns'); // Initialize the multi-select tag
+
+            document.getElementById('prediction-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('prediction-result').innerHTML = `<div class="result-item">${data.error}</div>`;
+                    } else {
+                        // Construct HTML for prediction results
+                        let resultHTML = `
+                            <div class="result-item">Predicted Value: ${data.prediction}</div>
+                            <div class="result-item">R-squared: ${data.r2.toFixed(4)}</div>
+                            <div class="result-item">Mean Squared Error (MSE): ${data.mse.toFixed(4)}</div>
+                            <div class="result-item">Root Mean Squared Error (RMSE): ${data.rmse.toFixed(4)}</div>
+                            <div class="result-item">Mean Absolute Percentage Error (MAPE): ${data.mape.toFixed(4)}</div>
+                        `;
+                        document.getElementById('prediction-result').innerHTML = resultHTML;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        </script>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             function fetchDataAndPlot(formData) {
