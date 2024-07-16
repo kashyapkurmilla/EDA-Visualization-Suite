@@ -12,15 +12,19 @@ body {
   color: #ffffff; /* White text */
   font-size: 14px;
 }
+.h1-head{
+  padding:10px;
+}
 
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #333333; /* Black navbar background */
-  padding: 8px 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  background-color: #333333;
+  /* Dark background */
+  padding: 15px 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   display: flex;
   justify-content: space-between;
