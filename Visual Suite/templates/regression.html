@@ -6,8 +6,7 @@
     <title>Regression Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/regression.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/css/multi-select-tag.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/css/multi-select-tag.css">
     <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/js/multi-select-tag.js"></script>
 </head>
 
@@ -54,8 +53,7 @@
             <div id="regression-result" style="margin-top: 20px;"></div>
         </div>
         <div class="visualization-container">
-            <!-- Radio buttons for selecting chart type -->
-            <div class="radio-block" id="chart-options">
+            <div class="radio-block" id="chart-options" style="display: none;">
                 <input type="radio" id="pairplot" name="chart_type" value="pairplot" checked>
                 <label for="pairplot">Pair Plot</label>
 
@@ -63,93 +61,80 @@
                 <label for="heatmap">Heatmap</label>
             </div>
             <div class="chart-container">
-                <div id="pair-plot" class="active"></div>
-                <div id="correlation-heatmap"></div>
-                <div id="regression-plot"></div>
+                <div id="pair-plot" class="active" style="display: none;"></div>
+                <div id="correlation-heatmap" style="display: none;"></div>
+                <div id="regression-plot" style="display: none;"></div>
             </div>
         </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Function to fetch data and update plots
             function fetchDataAndPlot(formData) {
                 fetch('/run_regression', {
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            document.getElementById('regression-result').innerText = data.error;
-                        } else {
-                            // Display regression results
-                            if (data.intercept !== undefined && data.coefficients !== undefined) {
-                                document.getElementById('regression-result').innerText = `Intercept: ${data.intercept}, Coefficients: ${JSON.stringify(data.coefficients)}`;
-                            } else if (data.feature_importances !== undefined) {
-                                document.getElementById('regression-result').innerText = `Feature Importances: ${JSON.stringify(data.feature_importances)}`;
-                            }
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('regression-result').innerText = data.error;
+                    } else {
+                        if (data.intercept !== undefined && data.coefficients !== undefined) {
+                            document.getElementById('regression-result').innerText = `Intercept: ${data.intercept}, Coefficients: ${JSON.stringify(data.coefficients)}`;
+                        } else if (data.feature_importances !== undefined) {
+                            document.getElementById('regression-result').innerText = `Feature Importances: ${JSON.stringify(data.feature_importances)}`;
+                        }
 
-                            // Clear previous plots
-                            Plotly.purge('regression-plot');
-                            Plotly.purge('pair-plot');
-                            Plotly.purge('correlation-heatmap');
+                        // Clear previous plots
+                        Plotly.purge('regression-plot');
+                        Plotly.purge('pair-plot');
+                        Plotly.purge('correlation-heatmap');
 
-                            // Display or hide charts based on selection
+                        // Determine which plot to display based on the number of selected independent variables
+                        const independentVariablesCount = formData.getAll('independent_variable').length;
+                        if (independentVariablesCount === 1) {
+                            document.getElementById('regression-plot').style.display = 'block';
+                            document.getElementById('pair-plot').style.display = 'none';
+                            document.getElementById('correlation-heatmap').style.display = 'none';
+                            document.getElementById('chart-options').style.display = 'none';
+
+                            Plotly.newPlot('regression-plot', data.plot_data.data, data.plot_data.layout);
+                        } else if (independentVariablesCount > 1) {
+                            document.getElementById('regression-plot').style.display = 'none';
+                            document.getElementById('chart-options').style.display = 'block';
+
                             const chartType = document.querySelector('input[name="chart_type"]:checked').value;
                             if (chartType === 'pairplot') {
-                                document.getElementById('pair-plot').classList.add('active');
-                                document.getElementById('correlation-heatmap').classList.remove('active');
+                                document.getElementById('pair-plot').style.display = 'block';
+                                document.getElementById('correlation-heatmap').style.display = 'none';
                                 Plotly.newPlot('pair-plot', data.pair_plot_data.data, data.pair_plot_data.layout);
                             } else if (chartType === 'heatmap') {
-                                document.getElementById('pair-plot').classList.remove('active');
-                                document.getElementById('correlation-heatmap').classList.add('active');
+                                document.getElementById('pair-plot').style.display = 'none';
+                                document.getElementById('correlation-heatmap').style.display = 'block';
                                 Plotly.newPlot('correlation-heatmap', data.correlation_heatmap_data.data, data.correlation_heatmap_data.layout);
                             }
-
-                            // Display regression plot if provided
-                            if (data.regression_plot_data) {
-                                Plotly.newPlot('regression-plot', data.regression_plot_data.data, data.regression_plot_data.layout);
-                            }
                         }
-                    })
-                    .catch(error => console.error('Error:', error));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
             }
 
-            // Initial plot setup when page loads
             const initialFormData = new FormData(document.getElementById('regression-form'));
             fetchDataAndPlot(initialFormData);
 
-            // Event listener for form submission
             document.getElementById('regression-form').addEventListener('submit', function (event) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
                 fetchDataAndPlot(formData);
             });
 
-            // Event listener for radio button changes
             document.querySelectorAll('input[name="chart_type"]').forEach(function (radio) {
                 radio.addEventListener('change', function () {
-                    const chartType = this.value;
-
-                    // Clear previous plots
-                    Plotly.purge('regression-plot');
-                    Plotly.purge('pair-plot');
-                    Plotly.purge('correlation-heatmap');
-
-                    // Display or hide charts based on selection
-                    if (chartType === 'pairplot') {
-                        document.getElementById('pair-plot').classList.add('active');
-                        document.getElementById('correlation-heatmap').classList.remove('active');
-                        Plotly.newPlot('pair-plot', pairPlotData, layout);  // Update with actual data from your response
-                    } else if (chartType === 'heatmap') {
-                        document.getElementById('pair-plot').classList.remove('active');
-                        document.getElementById('correlation-heatmap').classList.add('active');
-                        Plotly.newPlot('correlation-heatmap', heatmapData, layout);  // Update with actual data from your response
-                    }
+                    const formData = new FormData(document.getElementById('regression-form'));
+                    fetchDataAndPlot(formData);
                 });
             });
 
-            // Event listener for changes in independent variable selection
             document.getElementById('independent_variable').addEventListener('change', function () {
                 const selectedOptions = this.selectedOptions;
                 const chartOptions = document.getElementById('chart-options');
