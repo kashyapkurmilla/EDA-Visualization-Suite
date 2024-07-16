@@ -249,13 +249,16 @@ body {
     animation: underline-animation 0.5s ease-out 0s 3;
 }
 .animated-underline .dropbtn-text::after {
-    animation: underlineAnimation 1s ease-in-out 3;
+    animation: underlineAnimation 1s ease-in-out 1;
 }
 
 @keyframes underlineAnimation {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scaleX(0);
     }
+
     50% {
         transform: scaleX(1);
     }

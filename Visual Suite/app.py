@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, session, url_for, jsonify, flash
+from flask import Flask, redirect, render_template, request, session, url_for, jsonify, flash ,Response
 import pandas as pd
 import plotly.express as px
 import mysql.connector
@@ -22,6 +22,7 @@ import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
+import io
 
 
 # Load environment variables
@@ -125,6 +126,18 @@ def register():
                 msg = 'Could not connect to the database.'
 
     return render_template('register.html', msg=msg)
+
+# Route for logout
+@app.route('/logout')
+def logout():
+    # Clear session variables related to login
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    session.pop('preprocess_recommendation_shown', None)
+
+    # Redirect to login page after logout
+    return redirect(url_for('login'))
 
 # Route for data preview
 @app.route('/dataPreview')
@@ -230,7 +243,7 @@ def get_visualization():
         abs_col_values = df[column_name].abs()
 
         # Generate bubble plot based on the selected column
-        fig = px.scatter(df, x=column_name, y=df.index, size=abs_col_values, 
+        fig = px.scatter(df, y=column_name, x=df.index, size=abs_col_values, 
                          hover_name=df.index, log_x=True, size_max=60)
         fig.update_layout(height=600)
         viz_html = fig.to_html(full_html=False, default_height=400)
@@ -644,6 +657,29 @@ def comparativeanalysis():
     results_html = session.get('results_html', None)
 
     return render_template('companalysis.html', columns=columns, results_html=results_html)
+
+@app.route('/export_data', methods=['GET'])
+def export_data():
+    global df
+    
+    if df is None:
+        flash('No dataset available to export!', 'error')
+        return redirect(url_for('dashboard'))
+    
+    # Create a CSV file in memory
+    output = io.StringIO()
+    df.to_csv(output, index=False)
+    
+    # Set up response headers
+    response = Response(
+        output.getvalue(),
+        headers={
+            "Content-Disposition": "attachment; filename=dataset.csv",
+            "Content-Type": "text/csv"
+        }
+    )
+    
+    return response
 
 # Run application
 if __name__ == '__main__':
