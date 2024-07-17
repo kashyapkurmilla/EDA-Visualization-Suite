@@ -25,12 +25,6 @@ def create_missing_dash_application(flask_app):
                 className="me-auto",
                 style={'margin-right': '20px'}  # Add margin-right here
             ),
-            dbc.Nav(
-                [
-                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dashboard", style={'color': 'white'})),
-                ],
-                className="ml-auto",
-            ),
         ],
         color="dark",  # Use the 'dark' color theme
         dark=True,
@@ -84,12 +78,7 @@ def update_dash_app(dash_app, df):
                     className="me-auto",
                     style={'margin-right': '20px'}  # Add margin-right here
                 ),
-                dbc.Nav(
-                    [
-                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dashboard", style={'color': 'white'})),
-                    ],
-                    className="ml-auto",
-                ),
+                
             ],
             color="dark",  # Use the 'dark' color theme
             dark=True,
@@ -127,13 +116,7 @@ def create_cm_dash(flask_app):
                 className="me-auto",
                 style={'margin-right': '20px'}
             ),
-            dbc.Nav(
-                [
-                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue/", style={'color': 'white'})),
-                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix/", style={'color': 'white'})),
-                ],
-                className="ml-auto",
-            ),
+            
         ],
         color="dark",
         dark=True,
