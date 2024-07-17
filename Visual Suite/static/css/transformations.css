@@ -8,9 +8,12 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #ffffff;
-  color: #121212;
+  background-color: #121212; /* Dark background */
+  color: #ffffff; /* White text */
   font-size: 14px;
+}
+.h1-head{
+  padding:10px;
 }
 
 .navbar {
@@ -18,9 +21,10 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #000000;
-  padding: 8px 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  background-color: #333333;
+  /* Dark background */
+  padding: 15px 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   display: flex;
   justify-content: space-between;
@@ -28,7 +32,7 @@ body {
 }
 
 .navbar a {
-  color: #ffffff;
+  color: #ffffff; /* White links */
 }
 
 .nav {
@@ -46,18 +50,18 @@ body {
 .dropdown {
   position: relative;
 }
+
 .dropbtn-text {
   margin-right: 5px;
   margin-left: 5px;
   font-size: 14px;
   cursor: pointer;
-  color: #ffffff;
+  color: #ffffff; /* White text */
   text-decoration: none;
   font-weight: 500;
   position: relative;
   padding-bottom: 5px;
 }
-
 
 .dropbtn-text::after {
   content: '';
@@ -67,7 +71,7 @@ body {
   height: 2px;
   bottom: 0;
   left: 0;
-  background-color: #FFB400;
+  background-color: #FFB400; /* Ernst and Young yellow */
   transform-origin: bottom right;
   transition: transform 0.25s ease-out;
   z-index: 1;
@@ -81,7 +85,7 @@ body {
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #000000;
+  background-color: #2a2a2a; /* Dark grey dropdown background */
   min-width: 160px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
   z-index: 2;
@@ -91,7 +95,7 @@ body {
 }
 
 .dropdown-content a {
-  color: #ffffff;
+  color: #ffffff; /* White dropdown text */
   padding: 10px 15px;
   text-decoration: none;
   display: block;
@@ -99,7 +103,7 @@ body {
 }
 
 .dropdown-content a:hover {
-  background-color: #2a2a2a;
+  background-color: #333333; /* Darker grey on hover */
 }
 
 .dropdown:hover .dropdown-content {
@@ -126,7 +130,7 @@ body {
   position: relative;
   padding-left: 25px;
   cursor: pointer;
-  color: #121212;
+  color: #ffffff;
   font-size: 14px;
 }
 
@@ -137,12 +141,12 @@ body {
   top: 1px;
   width: 18px;
   height: 18px;
-  border: 2px solid #FFB400;
+  border: 2px solid #FFB400; /* Ernst and Young yellow */
   border-radius: 3px;
 }
 
 .checkbox-container input:checked + label:before {
-  background-color: #FFB400;
+  background-color: #FFB400; /* Ernst and Young yellow */
 }
 
 .select-container {
@@ -151,7 +155,7 @@ body {
 
 .select-container label {
   display: block;
-  color: #121212;
+  color: #ffffff;
   margin-bottom: 5px;
 }
 
@@ -159,18 +163,18 @@ body {
   width: 100%;
   padding: 10px;
   font-size: 14px;
-  border: 1px solid #121212;
+  border: 1px solid #ffffff; /* White border */
   border-radius: 4px;
-  background-color: #ffffff;
-  color: #121212;
+  background-color: #333333; /* Dark grey select background */
+  color: #ffffff; /* White text */
 }
 
 .apply-button {
   margin-top: 10px;
   padding: 10px 20px;
   font-size: 14px;
-  background-color: #FFB400;
-  color: #121212;
+  background-color: #FFB400; /* Ernst and Young yellow */
+  color: #121212; /* Dark text */
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -178,36 +182,36 @@ body {
 }
 
 .apply-button:hover {
-  background-color: #FFC863;
+  background-color: #FFC863; /* Lighter yellow on hover */
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background-color: #ffffff; /* White background */
+  background-color: #333333; /* Dark grey table background */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
 }
 
 .data-table th, .data-table td {
-  border: 1px solid #dddddd; /* Light grey border color */
-  padding: 10px; /* Adjusted padding for compact spacing */
+  border: 1px solid #555555; /* Darker grey border */
+  padding: 10px;
   text-align: left;
-  color: #121212; /* Dark text color */
+  color: #ffffff; /* White text */
 }
 
 .data-table th {
-  background-color: #f8f8f8; /* Light grey background for header */
+  background-color: #2a2a2a; /* Darker grey header */
 }
 
 .data-table td {
-  background-color: #ffffff; /* White background for cells */
+  background-color: #333333; /* Dark grey cells */
 }
 
 .data-table tbody tr:nth-child(even) td {
-  background-color: #f2f2f2; /* Slightly lighter grey for even rows */
+  background-color: #2e2e2e; /* Slightly lighter grey for even rows */
 }
 
 @media (max-width: 480px) {
@@ -222,5 +226,4 @@ body {
   .apply-button {
     font-size: 14px;
   }
-
 }

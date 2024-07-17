@@ -27,8 +27,7 @@ def create_missing_dash_application(flask_app):
             ),
             dbc.Nav(
                 [
-                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue/", style={'color': 'white'})),
-                    dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix/", style={'color': 'white'})),
+                    dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dashboard", style={'color': 'white'})),
                 ],
                 className="ml-auto",
             ),
@@ -87,8 +86,7 @@ def update_dash_app(dash_app, df):
                 ),
                 dbc.Nav(
                     [
-                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/missingvalue/", style={'color': 'white'})),
-                        dbc.NavItem(dbc.NavLink("Correlation Matrix", href="/correlationmatrix/", style={'color': 'white'})),
+                        dbc.NavItem(dbc.NavLink("Missing Analysis", href="/dashboard", style={'color': 'white'})),
                     ],
                     className="ml-auto",
                 ),

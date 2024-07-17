@@ -6,10 +6,12 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f3f2f1;
-    color: #212121;
-}
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Dark background */
+    color: #ffffff; /* White text */
+    font-size: 14px;
+  }
 
 .navbar {
     position: fixed;
@@ -17,54 +19,48 @@ body {
     left: 0;
     width: 100%;
     background-color: #333333;
-    padding: 8px 10px;
+    /* Dark background */
+    padding: 15px 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-}
+  }
 
-.navbar-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.navbar img {
-    max-width: 40px;
-    height: auto;
-}
-
-.navbar-links {
+  .navbar a {
+    color: #ffffff; /* White links */
+  }
+  
+  .nav {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-left: auto;
-}
-
-.navbar-links a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    margin-right: 10px;
-    transition: opacity 0.3s ease;
-}
-
-.navbar-links a:hover {
-    opacity: 0.8;
-}
-
-.dropbtn-text {
+    margin-right: 50px;
+  }
+  
+  .navbar img {
+    max-width: 50px;
+    height: auto;
+  }
+  
+  .dropdown {
+    position: relative;
+  }
+  
+  .dropbtn-text {
+    margin-right: 5px;
+    margin-left: 5px;
     font-size: 14px;
     cursor: pointer;
-    color: #ffffff;
+    color: #ffffff; /* White text */
     text-decoration: none;
     font-weight: 500;
     position: relative;
     padding-bottom: 5px;
-}
-
-.dropbtn-text::after {
+  }
+  
+  .dropbtn-text::after {
     content: '';
     position: absolute;
     width: 100%;
@@ -72,54 +68,52 @@ body {
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #FFB400;
+    background-color: #FFB400; /* Ernst and Young yellow */
     transform-origin: bottom right;
     transition: transform 0.25s ease-out;
     z-index: 1;
-}
-
-.dropbtn-text:hover::after {
+  }
+  
+  .dropbtn-text:hover::after {
     transform: scaleX(1);
     transform-origin: bottom left;
-}
-
-.dropdown-content {
+  }
+  
+  .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #262626;
-    min-width: 140px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    background-color: #2a2a2a; /* Dark grey dropdown background */
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
     z-index: 2;
     border-radius: 8px;
     top: 100%;
     margin-top: 5px;
-}
-
-.dropdown-content a {
-    color: #ffffff;
-    padding: 8px 10px;
+  }
+  
+  .dropdown-content a {
+    color: #ffffff; /* White dropdown text */
+    padding: 10px 15px;
     text-decoration: none;
     display: block;
     transition: background-color 0.2s ease;
-}
-
-.dropdown-content a:hover {
-    background-color: #3d3d3d;
-}
-
-.dropdown:hover .dropdown-content {
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #333333; /* Darker grey on hover */
+  }
+  
+  .dropdown:hover .dropdown-content {
     display: block;
-}
+  }
 
-.container {
-    max-width: 800px;
-    margin: 80px auto 40px;
-    background-color: #f3f2f1;
-    padding: 10px; /* Reduced padding */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    padding-top: 80px;
+  }
 
 .container.full-width {
     max-width: 100%;
@@ -128,7 +122,7 @@ body {
 }
 
 .container-title {
-    color: #212121;
+    color: #ffffff;
     margin-bottom: 15px; /* Reduced margin */
     font-size: 20px; /* Reduced font-size */
     font-weight: 500;
@@ -137,7 +131,7 @@ body {
 .input-section {
     margin-bottom: 15px; /* Reduced margin */
     padding: 15px; /* Reduced padding */
-    background-color: #fff;
+    background-color: #333333; /* Dark grey input background */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -159,8 +153,8 @@ body {
 .radio-container label {
     display: inline-block;
     padding: 6px 12px; /* Reduced padding */
-    background-color: #fff;
-    color: #212121;
+    background-color: #333333; /* Dark grey radio background */
+    color: #ffffff;
     border: 2px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
@@ -169,8 +163,8 @@ body {
 }
 
 .radio-container input[type="radio"]:checked + label {
-    background-color: #ffcc29;
-    border-color: #ffcc29;
+    background-color: #FFB400; /* Yellow selected background */
+    border-color: #FFB400; /* Yellow selected border */
     color: #212121;
 }
 
@@ -187,6 +181,7 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: #ffffff;
 }
 
 .select-container select {
@@ -194,8 +189,8 @@ body {
     padding: 8px; /* Reduced padding */
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: #fff;
-    color: #212121;
+    background-color: #333333; /* Dark grey select background */
+    color: #ffffff;
     font-size: 14px; /* Reduced font-size */
 }
 
@@ -204,7 +199,7 @@ button[type="submit"] {
     padding: 8px; /* Reduced padding */
     border: none;
     border-radius: 5px;
-    background-color: #ffcc29;
+    background-color: #FFB400; /* Yellow button background */
     color: #212121;
     font-weight: bold;
     cursor: pointer;
@@ -216,8 +211,8 @@ button[type="submit"]:hover {
 }
 
 .output-container {
-    background-color: #fff;
-    color: #212121;
+    background-color: #333333; /* Dark grey output background */
+    color: #ffffff;
     padding: 15px; /* Reduced padding */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -251,7 +246,6 @@ button[type="submit"]:hover {
 }
 
 .data-table th, .data-table td {
-    border: 1px solid #ccc;
     padding: 6px; /* Reduced padding */
     text-align: left;
 }
@@ -262,12 +256,12 @@ button[type="submit"]:hover {
 }
 
 .data-table td {
-    background-color: #fff;
-    color: #212121;
+    background-color: #333333; /* Dark grey table cell background */
+    color: #ffffff;
 }
 
 .data-table tr:nth-child(even) td {
-    background-color: #f3f2f1;
+    background-color: #262626; /* Dark grey alternate table row */
 }
 
 /* Updated styles for displaying duplicates in two columns */

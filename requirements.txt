@@ -1,11 +1,11 @@
 Flask
 pandas
 plotly
-mysql-connector
+mysql-connector-python
 python-dotenv
 scikit-learn
 scipy
-dash
-dash-bootstrap-components
+numpy
 pycaret
-seaborn
+lightgbm
+dash

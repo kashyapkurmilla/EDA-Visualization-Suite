@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, session, url_for, jsonify, flash
+from flask import Flask, redirect, render_template, request, session, url_for, jsonify, flash ,Response
 import pandas as pd
 import plotly.express as px
 import mysql.connector
@@ -22,6 +22,8 @@ import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
 from lightgbm import LGBMRegressor
+import io
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_percentage_error
 
 
 # Load environment variables
@@ -125,6 +127,18 @@ def register():
                 msg = 'Could not connect to the database.'
 
     return render_template('register.html', msg=msg)
+
+# Route for logout
+@app.route('/logout')
+def logout():
+    # Clear session variables related to login
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    session.pop('preprocess_recommendation_shown', None)
+
+    # Redirect to login page after logout
+    return redirect(url_for('login'))
 
 # Route for data preview
 @app.route('/dataPreview')
@@ -230,7 +244,7 @@ def get_visualization():
         abs_col_values = df[column_name].abs()
 
         # Generate bubble plot based on the selected column
-        fig = px.scatter(df, x=column_name, y=df.index, size=abs_col_values, 
+        fig = px.scatter(df, y=column_name, x=df.index, size=abs_col_values, 
                          hover_name=df.index, log_x=True, size_max=60)
         fig.update_layout(height=600)
         viz_html = fig.to_html(full_html=False, default_height=400)
@@ -435,7 +449,6 @@ def describe():
     return redirect('/statistics/')
 
 @app.route('/regression', methods=['GET'])
-#@login_required
 def regression():
     global df
     if df is None or df.empty:
@@ -451,20 +464,16 @@ def run_regression():
         if df is None or df.empty:
             return jsonify({'error': 'No data available. Please upload a dataset.'})
 
-        # Get form data
         dependent_variable = request.form['dependent_variable']
         independent_variables = request.form.getlist('independent_variable')
         regression_model = request.form['regression_model']
 
-        # Check if the form data is valid
         if not dependent_variable or not independent_variables or not regression_model:
             return jsonify({'error': 'Please provide all required inputs (dependent variable, independent variables, and regression model).'})
 
-        # Prepare data
         X = df[independent_variables]
         y = df[dependent_variable]
 
-        # Initialize the selected regression model
         model = None
         model_type = 'linear'
         if regression_model == 'linear_regression':
@@ -479,7 +488,7 @@ def run_regression():
             model = AdaBoostRegressor()
             model_type = 'ensemble'
         elif regression_model == 'bagging':
-            base_model = DecisionTreeRegressor()  # Example base model
+            base_model = DecisionTreeRegressor()
             model = BaggingRegressor(base_model)
             model_type = 'ensemble'
         elif regression_model == 'gradient_boosting':
@@ -491,20 +500,17 @@ def run_regression():
         else:
             return jsonify({'error': 'Invalid regression model selected'})
 
-        # Fit the model
         model.fit(X, y)
 
-        # Prepare results for visualization
-        plot_data = []
-        pair_plot_data = []
-        correlation_heatmap_data = []
+        plot_data = {}
+        pair_plot_data = {}
+        correlation_heatmap_data = {}
 
         if len(independent_variables) == 1:
             x_values = df[independent_variables[0]]
             fig = px.scatter(x=x_values, y=model.predict(X), labels={'x': independent_variables[0], 'y': 'Predicted'})
             plot_data = json.loads(fig.to_json())
         else:
-            # Pair plot and correlation heatmap for multiple independent variables
             pair_plot = px.scatter_matrix(df, dimensions=independent_variables, color=dependent_variable)
             correlation_heatmap = px.imshow(df[independent_variables + [dependent_variable]].corr(), text_auto=True)
             pair_plot_data = json.loads(pair_plot.to_json())
@@ -514,20 +520,13 @@ def run_regression():
         if model_type == 'linear':
             result['intercept'] = round(model.intercept_, 2)
             result['coefficients'] = [round(coef, 2) for coef in model.coef_]
-        elif model_type == 'tree' or model_type == 'ensemble':
-            # Access feature importances for decision tree-based models
+        elif model_type in ['tree', 'ensemble']:
             if hasattr(model, 'feature_importances_'):
                 result['feature_importances'] = [round(importance, 2) for importance in model.feature_importances_]
+            elif hasattr(model, 'base_estimator_') and hasattr(model.base_estimator_, 'feature_importances_'):
+                result['feature_importances'] = [round(importance, 2) for importance in model.base_estimator_.feature_importances_]
             else:
-                # For ensemble methods like BaggingRegressor, get feature importances from base estimator
-                if hasattr(model, 'base_estimator_'):
-                    base_model = model.base_estimator_
-                    if hasattr(base_model, 'feature_importances_'):
-                        result['feature_importances'] = [round(importance, 2) for importance in base_model.feature_importances_]
-                    else:
-                        return jsonify({'error': 'Base estimator does not support feature importances.'})
-                else:
-                    return jsonify({'error': 'Model does not support feature importances.'})
+                return jsonify({'error': 'Model does not support feature importances.'})
 
         result.update({
             'plot_data': plot_data,
@@ -539,6 +538,8 @@ def run_regression():
 
     except Exception as e:
         return jsonify({'error': str(e)})
+
+
 
 @app.route('/featureimportance', methods=['GET', 'POST'])
 def featureimportance():
@@ -658,71 +659,68 @@ def comparativeanalysis():
 
     return render_template('companalysis.html', columns=columns, results_html=results_html)
 
-# @app.route('/featureimportance', methods=['GET', 'POST'])
-# def featureimportance():
-#     global df
+@app.route('/export_data', methods=['GET'])
+def export_data():
+    global df
+    
+    if df is None:
+        flash('No dataset available to export!', 'error')
+        return redirect(url_for('dashboard'))
+    
+    # Create a CSV file in memory
+    output = io.StringIO()
+    df.to_csv(output, index=False)
+    
+    # Set up response headers
+    response = Response(
+        output.getvalue(),
+        headers={
+            "Content-Disposition": "attachment; filename=dataset.csv",
+            "Content-Type": "text/csv"
+        }
+    )
+    
+    return response
 
-#     if df is None or df.empty:
-#         print("Redirecting to dataPreview: df is None or empty")
-#         return redirect(url_for('dataPreview'))  # Redirect if no dataset is uploaded
+@app.route('/predict', methods=['POST'])
+def predict():
+    global df
+    
+    data = request.form.to_dict()
+    dependent_variable = data.get('prediction_column')
+    independent_variables = request.form.getlist('independent_columns')
+    input_values = list(map(float, data.get('prediction_input').split(',')))
 
-#     setup_df = df.copy()
-#     target_column = None
-#     model_type = None
-#     feature_importances_html = None
-#     columns = setup_df.columns.tolist()  # Keep columns list for rendering dropdown options
+    if df is None or dependent_variable not in df.columns or not all(var in df.columns for var in independent_variables):
+        return jsonify(error="Invalid columns selected")
 
-#     if request.method == 'POST':
-#         target_column = request.form.get('target_column')
-#         model_type = request.form.get('model_type')
+    try:
+        X = df[independent_variables].values
+        y = df[dependent_variable].values
 
-#         print(f"Selected target column: {target_column}")
-#         print(f"Selected model type: {model_type}")
+        model = LinearRegression()
+        model.fit(X, y)
 
-#         if target_column and target_column in setup_df.columns:
-#             try:
-#                 numeric_df = setup_df.select_dtypes(include=[np.number])
-#                 if target_column not in numeric_df.columns:
-#                     numeric_df[target_column] = setup_df[target_column]
+        predicted_value = model.predict([input_values])[0]
 
-#                 X = numeric_df.drop(columns=[target_column])
-#                 y = numeric_df[target_column]
+        # Calculate metrics
+        r2 = r2_score(y, model.predict(X))
+        mse = mean_squared_error(y, model.predict(X))
+        rmse = np.sqrt(mse)
+        mape = mean_absolute_percentage_error(y, model.predict(X))
 
-#                 scaler = StandardScaler()
-#                 X_scaled = scaler.fit_transform(X)
+        return jsonify(
+            prediction=predicted_value,
+            r2=r2,
+            mse=mse,
+            rmse=rmse,
+            mape=mape
+        )
 
-#                 if model_type == 'random_forest':
-#                     model = RandomForestRegressor()
-#                 elif model_type == 'linear_regression':
-#                     model = LinearRegression()
-#                 else:
-#                     raise ValueError("Invalid model type selected")
+    except Exception as e:
+        return jsonify(error=str(e))
 
-#                 model.fit(X_scaled, y)
-#                 if model_type == 'random_forest':
-#                     importances = model.feature_importances_
-#                 elif model_type == 'linear_regression':
-#                     importances = np.abs(model.coef_)
 
-#                 feature_importances = pd.DataFrame({
-#                     'Feature': X.columns,
-#                     'Importance': importances
-#                 }).sort_values(by='Importance', ascending=False)
-
-#                 feature_importances_html = feature_importances.to_html(classes='data-table', header="true", index=False)
-#                 session['feature_importances_html'] = feature_importances_html
-
-#             except Exception as e:
-#                 print(f"Error occurred: {e}")
-#                 flash(f"An error occurred: {e}", 'danger')
-
-#     feature_importances_html = session.get('feature_importances_html', None)
-
-#     return render_template('featureimportance.html', 
-#                            columns=columns, 
-#                            feature_importances_html=feature_importances_html, 
-#                            target_column=target_column, 
-#                            model_type=model_type)
 # Run application
 if __name__ == '__main__':
     app.run(debug=True)
