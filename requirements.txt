@@ -1,7 +1,7 @@
 Flask
 pandas
 plotly
-ysql-connector-python
+mysql-connector-python
 python-dotenv
 scikit-learn
 scipy

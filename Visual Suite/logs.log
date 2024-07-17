@@ -3678,3 +3678,124 @@ Passing literal json to 'read_json' is deprecated and will be removed in a futur
 'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
 2024-07-16 22:45:22,658:WARNING:
 'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:18:37,827:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:18:37,827:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:18:37,827:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:18:37,827:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:19:47,864:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:28: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 06:19:47,949:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:49: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 06:19:50,496:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:28: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 06:19:50,565:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:49: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 06:21:13,192:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:28: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 06:21:13,277:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:49: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 06:32:05,544:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:32:05,545:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:32:05,545:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 06:32:05,545:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:13:20,304:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:13:20,304:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:13:20,304:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:13:20,304:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:16:42,090:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:16:42,090:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:16:42,090:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:16:42,090:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 09:17:31,543:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:28: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 09:17:31,633:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:49: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 09:17:34,028:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:28: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 09:17:34,095:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:49: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 09:17:40,501:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/statistics.py:49: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 12:02:22,713:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:02:22,713:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:02:22,713:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:02:22,714:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:03:44,559:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/__init__.py:180: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 12:05:08,711:WARNING:/home/kashyap/Documents/EDA-Visualization-Suite/Visual Suite/dashApp/__init__.py:180: FutureWarning:
+
+Passing literal json to 'read_json' is deprecated and will be removed in a future version. To read from a literal string, wrap it in a 'StringIO' object.
+
+
+2024-07-17 12:07:38,900:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:07:38,900:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:07:38,900:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:07:38,900:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:09:11,300:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:09:11,300:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:09:11,300:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
+2024-07-17 12:09:11,300:WARNING:
+'cuml' is a soft dependency and not included in the pycaret installation. Please run: `pip install cuml` to install.
